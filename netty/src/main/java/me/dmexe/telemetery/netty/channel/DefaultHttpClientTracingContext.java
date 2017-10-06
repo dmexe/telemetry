@@ -73,7 +73,7 @@ class DefaultHttpClientTracingContext implements HttpTracingContext {
     requestStartTimeNanos = ticker.nanoTime();
     method = request.method();
 
-    final SpanContext spanContext = channel.attr(CLIENT_PARENT_SPAN_CONTEXT).get();
+    final SpanContext spanContext = HttpTracingContext.getContext(channel);
     if (spanContext != null) {
       span = tracer
           .buildSpan("http." + request.method().name())

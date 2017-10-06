@@ -16,3 +16,22 @@ buildscript {
   }
 }
 
+subprojects {
+  apply from: "../gradle/junit.gradle"
+  apply from: "../gradle/checks.gradle"
+
+  task downloadDependencies {
+    description "Pre-downloads *most* dependencies"
+    doLast {
+      project.logger.lifecycle("Retrieving dependencies for ${project.name}")
+      configurations.getAsMap().each { name, config ->
+        try {
+          config.files
+        } catch (e) {
+          project.logger.info e.message
+        }
+      }
+    }
+  }
+}
+

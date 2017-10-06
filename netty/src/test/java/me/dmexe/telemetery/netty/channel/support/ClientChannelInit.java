@@ -39,7 +39,6 @@ public class ClientChannelInit extends ChannelInitializer<SocketChannel> {
             .ticker(new ConstantTicker())
             .collectorRegistry(collectorRegistry)
             .newClientHandler());
-    pipe.addLast("log", new LoggingHandler());
     pipe.addLast(new HttpClientCodec());
     pipe.addLast(
         HttpTracingFactory.id(),

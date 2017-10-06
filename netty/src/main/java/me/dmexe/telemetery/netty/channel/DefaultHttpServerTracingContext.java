@@ -77,7 +77,7 @@ class DefaultHttpServerTracingContext implements HttpTracingContext {
     code = null;
 
     if (span != null) {
-      channel.attr(SERVER_CURRENT_SPAN).set(span);
+      HttpTracingContext.addSpan(channel, span);
     }
   }
 

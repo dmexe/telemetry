@@ -1,0 +1,22 @@
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+
+checkstyle {
+  toolVersion = '8.2'
+  configFile = rootProject.file("gradle/checkstyle.xml")
+  sourceSets = [sourceSets.main]
+  maxWarnings 0
+  maxErrors 0
+}
+
+findbugs {
+  toolVersion = '3.0.1'
+  sourceSets = [sourceSets.main]
+}
+
+tasks.withType(FindBugs) {
+  reports {
+    xml.enabled false
+    html.enabled true
+  }
+}

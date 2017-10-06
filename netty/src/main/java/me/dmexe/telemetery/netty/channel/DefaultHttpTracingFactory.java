@@ -1,6 +1,5 @@
 package me.dmexe.telemetery.netty.channel;
 
-
 import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_SUBSYSTEM;
 import static me.dmexe.telemetery.netty.channel.Constants.SERVER_SUBSYSTEM;
 

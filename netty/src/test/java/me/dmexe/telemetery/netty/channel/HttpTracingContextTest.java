@@ -177,8 +177,7 @@ class HttpTracingContextTest extends TestEnv {
         .containsEntry("http.content_length", 4)
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/ping")
-        .containsEntry("peer.address", "127.0.0.1")
-        .containsKey("peer.port");
+        .containsKeys("peer.port", "peer.address");
     assertThat(logEntries(serverSpan))
         .containsExactly("event=ss");
 
@@ -221,8 +220,7 @@ class HttpTracingContextTest extends TestEnv {
         .containsEntry("span.kind", "server")
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/server/error")
-        .containsEntry("peer.address", "127.0.0.1")
-        .containsKey("peer.port");
+        .containsKeys("peer.port", "peer.address");
     assertThat(logEntries(serverSpan))
         .containsExactly("event=ss");
 

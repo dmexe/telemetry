@@ -11,10 +11,15 @@ import io.opentracing.SpanContext;
 import javax.annotation.Nullable;
 
 public interface HttpTracingContext {
+
   void handleRequest(HttpRequest request, Channel channel);
+
   void handleResponse(HttpResponse response, Channel channel);
+
   void completed();
+
   void exceptionCaught(Throwable err);
+
   void exceptionCaught(String err);
 
   static void addSpan(Channel channel, Span span) {
