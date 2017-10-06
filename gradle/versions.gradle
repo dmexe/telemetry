@@ -1,4 +1,7 @@
 ext {
+  project_group = "me.dmexe.telemetry"
+  project_version = project.hasProperty('project.version') ? project.getProperty('project.version') : "0.0.1-SNAPSHOT"
+
   netty_version = "4.1.16.Final"
   opentracing_version = "0.30.0"
   prometheus_version = "0.0.26"

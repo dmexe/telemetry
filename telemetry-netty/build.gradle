@@ -1,6 +1,9 @@
 apply from: "../gradle/java.gradle"
 apply from: "../gradle/versions.gradle"
 
+group project_group
+version project_version
+
 repositories {
   mavenCentral()
 }

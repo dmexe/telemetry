@@ -6,6 +6,7 @@ buildscript {
 
   repositories {
     mavenCentral()
+    jcenter()
     maven {
       url "https://plugins.gradle.org/m2/"
     }
@@ -19,6 +20,7 @@ buildscript {
 subprojects {
   apply from: "../gradle/junit.gradle"
   apply from: "../gradle/checks.gradle"
+  apply from: "../gradle/publish.gradle"
 
   task downloadDependencies {
     description "Pre-downloads *most* dependencies"
@@ -34,4 +36,5 @@ subprojects {
     }
   }
 }
+
 

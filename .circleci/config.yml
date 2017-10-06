@@ -30,9 +30,9 @@ jobs:
       - run: gradle build
 
       - store_test_results:
-          path: netty/build/test-results/junit-platform
+          path: telemetry-netty/build/test-results/junit-platform
 
       - store_artifacts:
-          path: netty/build/reports
+          path: telemetry-netty/build/reports
           destination: netty-reports
 
