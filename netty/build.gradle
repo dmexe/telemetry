@@ -9,12 +9,15 @@ repositories {
 dependencies {
   compile "io.netty:netty-transport:${netty_version}"
   compile "io.netty:netty-codec-http:${netty_version}"
-  testCompile "io.netty:netty-handler:${netty_version}"
-
   compile "io.prometheus:simpleclient:${prometheus_version}"
-
+  compile "io.opentracing:opentracing-api:${opentracing_version}"
+  compile "io.opentracing:opentracing-util:${opentracing_version}"
   compile "org.slf4j:slf4j-api:${slf4j_version}"
-  testCompile "ch.qos.logback:logback-classic:${logback_version}"
 
   compileOnly "com.google.code.findbugs:jsr305:${findbugs_version}"
+
+  testCompile "io.netty:netty-handler:${netty_version}"
+  testCompile "com.squareup.okhttp3:mockwebserver:${okhttp_version}"
+  testCompile "io.opentracing:opentracing-mock:${opentracing_version}"
+  testCompile "ch.qos.logback:logback-classic:${logback_version}"
 }

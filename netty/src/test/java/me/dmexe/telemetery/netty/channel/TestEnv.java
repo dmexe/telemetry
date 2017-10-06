@@ -10,6 +10,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
+import io.opentracing.Span;
+import io.opentracing.Tracer;
 import io.prometheus.client.CollectorRegistry;
 import java.io.Closeable;
 import java.net.InetSocketAddress;
@@ -30,14 +32,14 @@ abstract class TestEnv {
   private static Duration lifecycleDuration = Duration.ofSeconds(3);
   private static Logger log = LoggerFactory.getLogger(TestEnv.class);
 
-  Client newClient(InetSocketAddress address, CollectorRegistry collectorRegistry) throws Exception {
+  Client newClient(InetSocketAddress address, CollectorRegistry collectorRegistry, Tracer tracer) throws Exception {
     final EventLoopGroup group = new NioEventLoopGroup(2);
     final BlockingQueue<HttpResponse> queue = new ArrayBlockingQueue<>(1);
     try {
       final Bootstrap bootstrap = new Bootstrap()
           .group(group)
           .channel(NioSocketChannel.class)
-          .handler(new ClientChannelInit(queue, collectorRegistry));
+          .handler(new ClientChannelInit(queue, collectorRegistry, tracer));
       final ChannelFuture future = bootstrap.connect(address).sync();
       return new Client(group, future, queue);
     } catch (Exception err) {
@@ -46,13 +48,13 @@ abstract class TestEnv {
     }
   }
 
-  Server newServer(CollectorRegistry collectorRegistry) throws Exception {
+  Server newServer(CollectorRegistry collectorRegistry, Tracer tracer) throws Exception {
     final EventLoopGroup group = new NioEventLoopGroup(2);
     try {
       final ServerBootstrap bootstrap = new ServerBootstrap()
           .group(group)
           .channel(NioServerSocketChannel.class)
-          .childHandler(new ServerChannelInit(collectorRegistry));
+          .childHandler(new ServerChannelInit(collectorRegistry, tracer));
       final ChannelFuture future = bootstrap.bind(0).sync();
       return new Server(group, future);
     } catch (Exception err) {
@@ -67,7 +69,7 @@ abstract class TestEnv {
         .collect(Collectors.toList());
   }
 
-  static List<String> samples(CollectorRegistry collectorRegistry) {
+  private static List<String> samples(CollectorRegistry collectorRegistry) {
     return Collections.list(collectorRegistry.metricFamilySamples()).stream()
         .flatMap(family ->
             family.samples.stream().map(sample ->
@@ -77,7 +79,6 @@ abstract class TestEnv {
         .sorted()
         .collect(Collectors.toList());
   }
-
 
   static class Client implements Closeable {
     private final EventLoopGroup group;
@@ -125,6 +126,11 @@ abstract class TestEnv {
 
     void request(HttpRequest request) {
       channel().writeAndFlush(request).awaitUninterruptibly(lifecycleDuration.toMillis());
+    }
+
+    void request(HttpRequest request, Span root) {
+      HttpTracingContext.addContext(channel(), root.context());
+      request(request);
     }
   }
 

@@ -18,9 +18,11 @@ import io.netty.channel.ChannelProgressiveFutureListener;
 import io.netty.channel.DefaultFileRegion;
 import io.netty.channel.FileRegion;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.DefaultHttpContent;
 import io.netty.handler.codec.http.DefaultHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpContent;
 import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.LastHttpContent;
@@ -35,6 +37,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.concurrent.ThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,12 +61,29 @@ class ServerHandler extends ChannelInboundHandlerAdapter {
         handlePing(ctx);
       } else if (request.uri().startsWith("/file")) {
         handleFile(ctx);
+      } else if (request.uri().startsWith("/server/error")) {
+        throw new RuntimeException("boom");
+      } else if (request.uri().startsWith("/sleep/second")) {
+        handleSleepSeconds(ctx);
       } else {
         handleNotFound(ctx);
       }
     } else {
       super.channelRead(ctx, msg);
     }
+  }
+
+  private void handleSleepSeconds(ChannelHandlerContext ctx) throws Exception {
+    Thread thread = new Thread(() -> {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException err) {
+        throw new RuntimeException(err);
+      }
+      handlePing(ctx);
+    });
+    thread.setDaemon(true);
+    thread.start();
   }
 
   private void handleNotFound(ChannelHandlerContext ctx) {
@@ -92,17 +112,30 @@ class ServerHandler extends ChannelInboundHandlerAdapter {
       if (!sendFileFuture.isSuccess()) {
         log.info("sendFile error", sendFileFuture.cause());
       }
+
+      if (sendFileFuture.isSuccess()) {
+        ctx.writeAndFlush(EMPTY_LAST_CONTENT);
+      }
     });
-    ctx.writeAndFlush(EMPTY_LAST_CONTENT);
   }
 
   private void handlePing(ChannelHandlerContext ctx) {
     final String responseBody = "Pong";
-    final FullHttpResponse response =
-        new DefaultFullHttpResponse(HTTP_1_1, OK, copiedBuffer(responseBody.getBytes()));
+    final HttpResponse response =
+        new DefaultHttpResponse(HTTP_1_1, OK);
 
     setContentLength(response, responseBody.length());
-    ctx.writeAndFlush(response);
+
+    ctx.writeAndFlush(response).addListener(future0 -> {
+      if (future0.isSuccess()) {
+        ctx.writeAndFlush(new DefaultHttpContent(copiedBuffer("Po".getBytes()))).addListener(future1 -> {
+          if (future1.isSuccess()) {
+            ctx.write(new DefaultHttpContent(copiedBuffer("ng".getBytes())));
+            ctx.writeAndFlush(EMPTY_LAST_CONTENT);
+          }
+        });
+      }
+    });
   }
 
   @Override
@@ -113,12 +146,9 @@ class ServerHandler extends ChannelInboundHandlerAdapter {
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
     log.error("exception caught: {}", cause.getMessage(), cause);
-    ctx.writeAndFlush(
-        new DefaultFullHttpResponse(
-            HTTP_1_1,
-            HttpResponseStatus.INTERNAL_SERVER_ERROR,
-            copiedBuffer(cause.getMessage().getBytes())
-        ));
+    final FullHttpResponse response = new DefaultFullHttpResponse(HTTP_1_1, HttpResponseStatus.INTERNAL_SERVER_ERROR);
+    setContentLength(response, 0);
+    ctx.writeAndFlush(response);
   }
 }
 

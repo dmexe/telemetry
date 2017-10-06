@@ -2,7 +2,6 @@ package me.dmexe.telemetery.netty.channel;
 
 import io.netty.channel.ChannelHandler;
 import io.prometheus.client.CollectorRegistry;
-import java.util.function.Supplier;
 
 public interface ChannelTracingFactory {
   ChannelTracingFactory address(String address);
