@@ -83,13 +83,27 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   @Nullable
   private CollectorRegistry collectorRegistry;
 
-  @Nullable
   private Ticker ticker;
 
-  @Override
-  public ChannelTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
+  public DefaultChannelTracingFactory() {
+    this.ticker = System::nanoTime;
+  }
+
+  /**
+   * Assign a {@link CollectorRegistry}, it's only for testing.
+   */
+  public DefaultChannelTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
     this.collectorRegistry = collectorRegistry;
+    return this;
+  }
+
+  /**
+   * Assign a {@link Ticker}, it's only for testing.
+   */
+  public DefaultChannelTracingFactory ticker(Ticker ticker) {
+    Objects.requireNonNull(ticker, "ticker cannot be null");
+    this.ticker = ticker;
     return this;
   }
 
@@ -108,13 +122,6 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   }
 
   @Override
-  public ChannelTracingFactory ticker(Ticker ticker) {
-    Objects.requireNonNull(ticker, "ticker cannot be null");
-    this.ticker = ticker;
-    return this;
-  }
-
-  @Override
   public ChannelHandler newClientHandler() {
     return new ChannelTracingHandler(newClientTracingContext());
   }
@@ -125,13 +132,6 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   }
 
   private ChannelTracingContext newClientTracingContext() {
-    Ticker ticker;
-    if (this.ticker == null) {
-      ticker = System::nanoTime;
-    } else {
-      ticker = this.ticker;
-    }
-
     if (collectorRegistry == null) {
       return new DefaultChannelTracingContext(
           address,
@@ -154,13 +154,6 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   }
 
   private ChannelTracingContext newServerTracingContext() {
-    Ticker ticker;
-    if (this.ticker == null) {
-      ticker = System::nanoTime;
-    } else {
-      ticker = this.ticker;
-    }
-
     if (collectorRegistry == null) {
       return new DefaultChannelTracingContext(
           address,

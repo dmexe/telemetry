@@ -22,15 +22,15 @@ public interface HttpTracingContext {
 
   void exceptionCaught(String err);
 
-  static void addSpan(Channel channel, Span span) {
+  static void addServerCurrentSpan(Channel channel, Span span) {
     channel.attr(SERVER_CURRENT_SPAN).set(span);
   }
 
-  static void addContext(Channel channel, SpanContext spanContext) {
-    channel.attr(CLIENT_PARENT_SPAN_CONTEXT).set(spanContext);
+  static void addClientParentContext(Channel channel, SpanContext spanParentContext) {
+    channel.attr(CLIENT_PARENT_SPAN_CONTEXT).set(spanParentContext);
   }
 
-  static @Nullable SpanContext getContext(Channel channel) {
+  static @Nullable SpanContext getClientParentContext(Channel channel) {
     return channel.attr(CLIENT_PARENT_SPAN_CONTEXT).get();
   }
 }

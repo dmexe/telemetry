@@ -1,6 +1,5 @@
 package me.dmexe.telemetery.netty.channel;
 
-import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_PARENT_SPAN_CONTEXT;
 import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_RECEIVE_LOG_NAME;
 import static me.dmexe.telemetery.netty.channel.Constants.ERROR_KIND_LOG_NAME;
 import static me.dmexe.telemetery.netty.channel.Constants.ERROR_MESSAGE_LOG_NAME;
@@ -73,7 +72,7 @@ class DefaultHttpClientTracingContext implements HttpTracingContext {
     requestStartTimeNanos = ticker.nanoTime();
     method = request.method();
 
-    final SpanContext spanContext = HttpTracingContext.getContext(channel);
+    final SpanContext spanContext = HttpTracingContext.getClientParentContext(channel);
     if (spanContext != null) {
       span = tracer
           .buildSpan("http." + request.method().name())

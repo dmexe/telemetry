@@ -129,7 +129,7 @@ abstract class TestEnv {
     }
 
     void request(HttpRequest request, Span root) {
-      HttpTracingContext.addContext(channel(), root.context());
+      HttpTracingContext.addClientParentContext(channel(), root.context());
       request(request);
     }
   }

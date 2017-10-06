@@ -6,7 +6,6 @@ import static me.dmexe.telemetery.netty.channel.Constants.HTTP_COMPONENT_NAME;
 import static me.dmexe.telemetery.netty.channel.Constants.HTTP_CONTENT_LENGTH;
 import static me.dmexe.telemetery.netty.channel.Constants.HTTP_CONTENT_TYPE;
 import static me.dmexe.telemetery.netty.channel.Constants.PEER_ADDRESS;
-import static me.dmexe.telemetery.netty.channel.Constants.SERVER_CURRENT_SPAN;
 import static me.dmexe.telemetery.netty.channel.Constants.SERVER_SEND_LOG_NAME;
 
 import io.netty.channel.Channel;
@@ -77,7 +76,7 @@ class DefaultHttpServerTracingContext implements HttpTracingContext {
     code = null;
 
     if (span != null) {
-      HttpTracingContext.addSpan(channel, span);
+      HttpTracingContext.addServerCurrentSpan(channel, span);
     }
   }
 

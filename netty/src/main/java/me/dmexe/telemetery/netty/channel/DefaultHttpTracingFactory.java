@@ -41,15 +41,29 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   private CollectorRegistry collectorRegistry;
 
   @Nullable
-  private Ticker ticker;
-
-  @Nullable
   private Tracer tracer;
 
-  @Override
-  public HttpTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
+  private Ticker ticker;
+
+  public DefaultHttpTracingFactory() {
+    this.ticker = System::nanoTime;
+  }
+
+  /**
+   * Assign a {@link CollectorRegistry}, it's only for testing.
+   */
+  public DefaultHttpTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
     this.collectorRegistry = collectorRegistry;
+    return this;
+  }
+
+  /**
+   * Assign a {@link Ticker}, it's only for testing.
+   */
+  public DefaultHttpTracingFactory ticker(Ticker ticker) {
+    Objects.requireNonNull(ticker, "ticker cannot be null");
+    this.ticker = ticker;
     return this;
   }
 
@@ -64,13 +78,6 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   public HttpTracingFactory address(String host, int port) {
     Objects.requireNonNull(host, "host cannot be null");
     this.address = host + ":" + port;
-    return this;
-  }
-
-  @Override
-  public HttpTracingFactory ticker(Ticker ticker) {
-    Objects.requireNonNull(ticker, "ticker cannot be null");
-    this.ticker = ticker;
     return this;
   }
 
@@ -92,10 +99,6 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   }
 
   private HttpTracingContext newServerTracingContext() {
-    if (this.ticker == null) {
-      this.ticker = System::nanoTime;
-    }
-
     Tracer tracer;
     if (this.tracer == null) {
       tracer = GlobalTracer.get();
@@ -121,8 +124,12 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   }
 
   private HttpTracingContext newClientTracingContext() {
+    Ticker ticker;
+
     if (this.ticker == null) {
-      this.ticker = System::nanoTime;
+      ticker = System::nanoTime;
+    } else {
+      ticker = this.ticker;
     }
 
     Tracer tracer;
