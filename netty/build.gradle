@@ -1,0 +1,20 @@
+apply from: "../gradle/java.gradle"
+apply from: "../gradle/junit.gradle"
+apply from: "../gradle/versions.gradle"
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "io.netty:netty-transport:${netty_version}"
+  compile "io.netty:netty-codec-http:${netty_version}"
+  testCompile "io.netty:netty-handler:${netty_version}"
+
+  compile "io.prometheus:simpleclient:${prometheus_version}"
+
+  compile "org.slf4j:slf4j-api:${slf4j_version}"
+  testCompile "ch.qos.logback:logback-classic:${logback_version}"
+
+  compileOnly "com.google.code.findbugs:jsr305:${findbugs_version}"
+}

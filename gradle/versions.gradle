@@ -1,0 +1,8 @@
+ext {
+  netty_version = "4.1.16.Final"
+  opentracing_version = "0.30.0"
+  prometheus_version = "0.0.26"
+  findbugs_version = "3.0.2"
+  slf4j_version = "1.7.25"
+  logback_version = "1.2.3"
+}
