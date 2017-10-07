@@ -16,7 +16,8 @@ dependencies {
   compile "io.opentracing:opentracing-util:${opentracing_version}"
   compile "org.slf4j:slf4j-api:${slf4j_version}"
 
-  compileOnly "com.google.code.findbugs:jsr305:${findbugs_version}"
+  compileOnly "org.jetbrains:annotations:${jetbrains_annotations_version}"
+  testCompileOnly "org.jetbrains:annotations:${jetbrains_annotations_version}"
 
   testCompile "io.netty:netty-handler:${netty_version}"
   testCompile "com.squareup.okhttp3:mockwebserver:${okhttp_version}"

@@ -10,7 +10,7 @@ import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class DefaultHttpTracingFactory implements HttpTracingFactory {
   private static final Counter.Builder handledBuilder = Counter.build()
@@ -27,15 +27,19 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
           + "handled.");
 
   private static class Lazy {
-    private static Counter clientHandled = handledBuilder.subsystem(CLIENT_SUBSYSTEM).register();
-    private static Histogram clientLatency = latencyBuilder.subsystem(CLIENT_SUBSYSTEM).register();
+    private static final Counter clientHandled =
+        handledBuilder.subsystem(CLIENT_SUBSYSTEM).register();
+    private static final Histogram clientLatency =
+        latencyBuilder.subsystem(CLIENT_SUBSYSTEM).register();
 
-    private static Counter serverHandled = handledBuilder.subsystem(SERVER_SUBSYSTEM).register();
-    private static Histogram serverLatency = latencyBuilder.subsystem(SERVER_SUBSYSTEM).register();
+    private static final Counter serverHandled =
+        handledBuilder.subsystem(SERVER_SUBSYSTEM).register();
+    private static final Histogram serverLatency =
+        latencyBuilder.subsystem(SERVER_SUBSYSTEM).register();
   }
 
-  @Nullable
   private String address;
+  private Ticker ticker;
 
   @Nullable
   private CollectorRegistry collectorRegistry;
@@ -43,7 +47,6 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   @Nullable
   private Tracer tracer;
 
-  private Ticker ticker;
 
   public DefaultHttpTracingFactory() {
     this.ticker = System::nanoTime;
@@ -55,6 +58,7 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   public DefaultHttpTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
     this.collectorRegistry = collectorRegistry;
+    this.address = ":0";
     return this;
   }
 
@@ -99,12 +103,8 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   }
 
   private HttpTracingContext newServerTracingContext() {
-    Tracer tracer;
-    if (this.tracer == null) {
-      tracer = GlobalTracer.get();
-    } else {
-      tracer = this.tracer;
-    }
+    final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
+    final Tracer tracer = this.tracer == null ? GlobalTracer.get() : this.tracer;
 
     if (collectorRegistry == null) {
       return new DefaultHttpServerTracingContext(
@@ -124,20 +124,8 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   }
 
   private HttpTracingContext newClientTracingContext() {
-    Ticker ticker;
-
-    if (this.ticker == null) {
-      ticker = System::nanoTime;
-    } else {
-      ticker = this.ticker;
-    }
-
-    Tracer tracer;
-    if (this.tracer == null) {
-      tracer = GlobalTracer.get();
-    } else {
-      tracer = this.tracer;
-    }
+    final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
+    final Tracer tracer = this.tracer == null ? GlobalTracer.get() : this.tracer;
 
     if (collectorRegistry == null) {
       return new DefaultHttpClientTracingContext(

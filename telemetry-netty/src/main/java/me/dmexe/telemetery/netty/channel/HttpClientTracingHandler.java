@@ -1,6 +1,7 @@
 package me.dmexe.telemetery.netty.channel;
 
 import static me.dmexe.telemetery.netty.channel.Constants.SERVER_CONNECTION_CLOSED;
+import static me.dmexe.telemetery.netty.channel.Constants.SERVER_CONNECTION_CLOSED_RESPONSE;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +14,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * There is a state machine for HTTP request/response cycle. Handles transition
+ * between IDLE -> REQUEST_SEND -> RESPONSE_RECEIVED -> COMPLETED -> IDLE states.
+ */
 class HttpClientTracingHandler extends ChannelDuplexHandler {
   private static final Logger log = LoggerFactory.getLogger(HttpClientTracingHandler.class);
 
@@ -23,7 +28,7 @@ class HttpClientTracingHandler extends ChannelDuplexHandler {
     COMPLETED
   }
 
-  private HttpTracingContext stats;
+  private final HttpTracingContext stats;
   private State state;
 
   HttpClientTracingHandler(HttpTracingContext stats) {
@@ -32,15 +37,12 @@ class HttpClientTracingHandler extends ChannelDuplexHandler {
     reset();
   }
 
-  /**
-   * Save a response status and after {@link LastHttpContent} record metrics.
-   */
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     if (msg instanceof HttpResponse && !isContinueResponse(msg)) {
       if (nextState(State.RESPONSE_RECEIVED)) {
         HttpResponse response = (HttpResponse) msg;
-        stats.handleResponse(response, ctx.channel());
+        stats.handleResponse(response);
       }
     }
 
@@ -54,9 +56,6 @@ class HttpClientTracingHandler extends ChannelDuplexHandler {
     super.channelRead(ctx, msg);
   }
 
-  /**
-   * Save request method and create a request timer.
-   */
   @Override
   public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)
       throws Exception {
@@ -71,15 +70,13 @@ class HttpClientTracingHandler extends ChannelDuplexHandler {
     super.write(ctx, msg, promise);
   }
 
-  /**
-   * TODO: add tests for both cases.
-   */
   @Override
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
     // If request already sent, but channel deactivated without response, consider that a timeout
     // error happens.
     if (state == State.REQUEST_SEND) {
       state = State.RESPONSE_RECEIVED;
+      stats.handleResponse(SERVER_CONNECTION_CLOSED_RESPONSE);
       stats.exceptionCaught(SERVER_CONNECTION_CLOSED);
 
       if (nextState(State.COMPLETED)) {
@@ -104,6 +101,7 @@ class HttpClientTracingHandler extends ChannelDuplexHandler {
 
   @Override
   public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+    stats.exceptionCaught(cause);
     super.exceptionCaught(ctx, cause);
   }
 

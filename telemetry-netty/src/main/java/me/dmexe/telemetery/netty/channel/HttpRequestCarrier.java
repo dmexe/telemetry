@@ -5,6 +5,7 @@ import io.opentracing.propagation.TextMap;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Objects;
+import org.jetbrains.annotations.NotNull;
 
 class HttpRequestCarrier implements TextMap {
   private final HttpRequest request;
@@ -15,13 +16,13 @@ class HttpRequestCarrier implements TextMap {
   }
 
   @Override
+  @NotNull
   public Iterator<Entry<String, String>> iterator() {
     return request.headers().iteratorAsString();
   }
 
   @Override
   public void put(String key, String value) {
-    System.out.println("key=" + key + " value=" + value);
     request.headers().add(key, value);
   }
 }

@@ -1,6 +1,7 @@
 package me.dmexe.telemetery.netty.channel;
 
 import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_CONNECTION_CLOSED;
+import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_CONNECTION_CLOSED_RESPONSE;
 
 import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,6 +14,10 @@ import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * There is a state machine for HTTP request/response cycle. Handles transition
+ * between IDLE -> REQUEST_RECEIVED -> RESPONSE_SEND -> COMPLETED -> IDLE states.
+ */
 public class HttpServerTracingHandler extends ChannelDuplexHandler {
   private static final Logger log = LoggerFactory.getLogger(HttpServerTracingHandler.class);
 
@@ -32,9 +37,6 @@ public class HttpServerTracingHandler extends ChannelDuplexHandler {
     reset();
   }
 
-  /**
-   * Save a request duration timer and request method.
-   */
   @Override
   public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
     if (msg instanceof HttpRequest) {
@@ -47,9 +49,6 @@ public class HttpServerTracingHandler extends ChannelDuplexHandler {
     super.channelRead(ctx, msg);
   }
 
-  /**
-   * Save a response status and after {@link LastHttpContent} record request time.
-   */
   @Override
   public void write(ChannelHandlerContext ctx, Object msg, ChannelPromise promise)
       throws Exception {
@@ -57,7 +56,7 @@ public class HttpServerTracingHandler extends ChannelDuplexHandler {
     if (msg instanceof HttpResponse && !isContinueResponse(msg)) {
       if (nextState(State.RESPONSE_SEND)) {
         HttpResponse response = (HttpResponse) msg;
-        stats.handleResponse(response, ctx.channel());
+        stats.handleResponse(response);
       }
     }
 
@@ -77,6 +76,7 @@ public class HttpServerTracingHandler extends ChannelDuplexHandler {
   public void channelInactive(ChannelHandlerContext ctx) throws Exception {
     // client closed connection abnormally.
     if (state == State.REQUEST_RECEIVED) {
+      stats.handleResponse(CLIENT_CONNECTION_CLOSED_RESPONSE);
       stats.exceptionCaught(CLIENT_CONNECTION_CLOSED);
     }
 

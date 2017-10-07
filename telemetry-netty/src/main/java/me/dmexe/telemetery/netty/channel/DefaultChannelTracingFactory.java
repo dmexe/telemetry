@@ -6,7 +6,7 @@ import io.prometheus.client.Counter;
 import io.prometheus.client.Gauge;
 import io.prometheus.client.Summary;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class DefaultChannelTracingFactory implements ChannelTracingFactory {
 
@@ -77,13 +77,11 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
         bytesReceivedBuilder.subsystem(SERVER_SUBSYSTEM).register();
   }
 
-  @Nullable
+  private Ticker ticker;
   private String address;
 
   @Nullable
   private CollectorRegistry collectorRegistry;
-
-  private Ticker ticker;
 
   public DefaultChannelTracingFactory() {
     this.ticker = System::nanoTime;
@@ -95,6 +93,7 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   public DefaultChannelTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
     this.collectorRegistry = collectorRegistry;
+    this.address = ":0";
     return this;
   }
 
@@ -132,6 +131,8 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   }
 
   private ChannelTracingContext newClientTracingContext() {
+    final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
+
     if (collectorRegistry == null) {
       return new DefaultChannelTracingContext(
           address,
@@ -154,6 +155,8 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   }
 
   private ChannelTracingContext newServerTracingContext() {
+    final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
+
     if (collectorRegistry == null) {
       return new DefaultChannelTracingContext(
           address,

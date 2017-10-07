@@ -8,13 +8,13 @@ import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpResponse;
 import io.opentracing.Span;
 import io.opentracing.SpanContext;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public interface HttpTracingContext {
 
   void handleRequest(HttpRequest request, Channel channel);
 
-  void handleResponse(HttpResponse response, Channel channel);
+  void handleResponse(HttpResponse response);
 
   void completed();
 

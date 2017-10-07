@@ -11,4 +11,5 @@ ext {
   slf4j_version = "1.7.25"
   logback_version = "1.2.3"
   okhttp_version = "3.8.1"
+  jetbrains_annotations_version = "15.0"
 }

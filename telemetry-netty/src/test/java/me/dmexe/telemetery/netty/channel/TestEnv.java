@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import me.dmexe.telemetery.netty.channel.support.ClientChannelInit;
 import me.dmexe.telemetery.netty.channel.support.ServerChannelInit;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,6 +117,7 @@ abstract class TestEnv {
       return future.channel();
     }
 
+    @Nullable
     HttpResponse response() {
       try {
         return queue.poll(lifecycleDuration.getSeconds(), TimeUnit.SECONDS);

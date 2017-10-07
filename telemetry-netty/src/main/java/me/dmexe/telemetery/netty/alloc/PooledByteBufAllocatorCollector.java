@@ -41,8 +41,6 @@ public class PooledByteBufAllocatorCollector extends Collector {
 
   @Override
   public List<MetricFamilySamples> collect() {
-    final List<MetricFamilySamples> samples = new LinkedList<>();
-
     final GaugeMetricFamily arenaNumActiveAllocations =
         gauge("num_active_allocations", "The number of currently active allocations.",
             "pool", "arena");
@@ -99,6 +97,8 @@ public class PooledByteBufAllocatorCollector extends Collector {
           .mapToLong(PoolArenaMetric::numDeallocations).sum();
       arenaNumDeallocations.addMetric(directLabelValues, value);
     });
+
+    final List<MetricFamilySamples> samples = new LinkedList<>();
 
     samples.add(arenaNumActiveAllocations);
     samples.add(arenaNumAllocations);

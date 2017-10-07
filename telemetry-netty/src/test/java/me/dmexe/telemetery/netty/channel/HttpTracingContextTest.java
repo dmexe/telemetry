@@ -22,7 +22,6 @@ import java.net.Socket;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import me.dmexe.telemetery.netty.channel.TestEnv;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.SocketPolicy;
@@ -263,12 +262,35 @@ class HttpTracingContextTest extends TestEnv {
 
     final MockSpan serverSpan = getServerSpan();
     assertThat(serverSpan.tags())
-        .doesNotContainKeys("http.status_code")
+        .containsEntry("http.status_code", 499)
         .containsEntry("error", true);
     assertThat(logEntries(serverSpan))
         .containsExactly(
             "error.kind=java.lang.String",
-            "error.message=the client closed the connection before the server answered the request");
+            "error.message=the client closed the connection before the server answered the request",
+            "event=ss");
+
+    await().timeout(TWO_SECONDS).untilAsserted(() ->
+        assertThat(samples(collectorRegistry, "http_server"))
+            .containsExactly(
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,+Inf}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.005}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.01}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.025}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.05}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.075}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.1}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.25}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.5}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,0.75}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,1.0}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,10.0}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,2.5}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,5.0}=1.0",
+                "http_server_handled_latency_seconds_bucket{:0,499,GET,7.5}=1.0",
+                "http_server_handled_latency_seconds_count{:0,499,GET}=1.0",
+                "http_server_handled_latency_seconds_sum{:0,499,GET}=0.001",
+                "http_server_handled_total{:0,499,GET}=1.0"));
   }
 
   @Test
@@ -298,12 +320,35 @@ class HttpTracingContextTest extends TestEnv {
     final MockSpan clientSpan = getClientSpan();
 
     assertThat(clientSpan.tags())
-        .doesNotContainKeys("http.status_code")
+        .containsEntry("http.status_code", 500)
         .containsEntry("error", true);
     assertThat(logEntries(clientSpan))
         .containsExactly(
             "error.kind=java.lang.String",
-            "error.message=the server closed the connection before the client received the response");
+            "error.message=the server closed the connection before the client received the response",
+            "event=cr");
+
+    await().timeout(TWO_SECONDS).untilAsserted(() ->
+        assertThat(samples(collectorRegistry, "http_client"))
+            .containsExactly(
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,+Inf}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.005}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.01}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.025}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.05}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.075}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.1}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.25}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.5}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,0.75}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,1.0}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,10.0}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,2.5}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,5.0}=1.0",
+                "http_client_handled_latency_seconds_bucket{:0,500,GET,7.5}=1.0",
+                "http_client_handled_latency_seconds_count{:0,500,GET}=1.0",
+                "http_client_handled_latency_seconds_sum{:0,500,GET}=0.001",
+                "http_client_handled_total{:0,500,GET}=1.0"));
   }
 
   private static List<String> logEntries(MockSpan mockSpan) {

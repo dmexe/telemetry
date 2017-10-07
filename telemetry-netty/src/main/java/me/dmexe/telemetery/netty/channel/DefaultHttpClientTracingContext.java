@@ -24,10 +24,10 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 class DefaultHttpClientTracingContext implements HttpTracingContext {
-  private static long NULL_NANO = -1L;
+  private static final long NULL_NANO = -1L;
 
   private final String address;
   private final Tracer tracer;
@@ -97,7 +97,7 @@ class DefaultHttpClientTracingContext implements HttpTracingContext {
   }
 
   @Override
-  public void handleResponse(HttpResponse response, Channel channel) {
+  public void handleResponse(HttpResponse response) {
     code = Integer.toString(response.status().code());
 
     if (span != null) {

@@ -7,7 +7,7 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.FileRegion;
 import java.util.Objects;
 
-public class ChannelTracingHandler extends ChannelDuplexHandler {
+class ChannelTracingHandler extends ChannelDuplexHandler {
   private final ChannelTracingContext stats;
 
   ChannelTracingHandler(ChannelTracingContext stats) {
