@@ -1,1 +1,2 @@
 include "telemetry-netty"
+include "telemetry-kafka"

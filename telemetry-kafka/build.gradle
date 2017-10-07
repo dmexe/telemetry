@@ -1,0 +1,19 @@
+apply from: "../gradle/java.gradle"
+apply from: "../gradle/versions.gradle"
+
+group project_group
+version project_version
+
+repositories {
+  mavenCentral()
+}
+
+dependencies {
+  compile "org.apache.kafka:kafka-clients:${kafka_version}"
+  compile "io.prometheus:simpleclient:${prometheus_version}"
+  compile "io.opentracing:opentracing-api:${opentracing_version}"
+  compile "io.opentracing:opentracing-util:${opentracing_version}"
+
+  compileOnly "org.jetbrains:annotations:${jetbrains_annotations_version}"
+  testCompileOnly "org.jetbrains:annotations:${jetbrains_annotations_version}"
+}
