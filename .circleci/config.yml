@@ -7,6 +7,16 @@ jobs:
   build:
     docker:
       - image: circleci/openjdk:8-jdk
+      - image: zookeeper:3.4
+      - image: wurstmeister/kafka:0.10.2.0
+        environment:
+          KAFKA_ZOOKEEPER_CONNECT: "localhost:2181"
+          KAFKA_ADVERTISED_HOST_NAME: "localhost"
+          KAFKA_ADVERTISED_PORT: "9092"
+      - image: mariadb:10.1
+        environment:
+          MYSQL_ROOT_PASSWORD: "root"
+
     working_directory: ~/repo
 
     environment:
@@ -26,6 +36,14 @@ jobs:
           paths:
             - ~/.gradle
           key: v3-dependencies-{{ checksum "gradle/versions.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}
+
+      - run:
+          name: Wait for Kafka
+          command: dockerize -wait tcp://localhost:9092 -timeout 1m
+
+      - run:
+          name: Wait for MySql
+          command: dockerize -wait tcp://localhost:3306 -timeout 1m
 
       - run: gradle build
 
