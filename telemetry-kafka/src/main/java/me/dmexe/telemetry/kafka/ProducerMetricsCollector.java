@@ -13,18 +13,18 @@ import org.apache.kafka.common.Metric;
 import org.apache.kafka.common.MetricName;
 
 public class ProducerMetricsCollector extends Collector {
-  private final Supplier<Map<MetricName, ? extends Metric>> metrics;
+  private final MetricsProducer producer;
 
-  public ProducerMetricsCollector(Supplier<Map<MetricName, ? extends Metric>> metrics) {
-    Objects.requireNonNull(metrics, "metrics cannot be null");
-    this.metrics = metrics;
+  public ProducerMetricsCollector(MetricsProducer producer) {
+    Objects.requireNonNull(producer, "metrics producer cannot be null");
+    this.producer = producer;
   }
 
   @Override
   public List<MetricFamilySamples> collect() {
     final List<MetricFamilySamples> samples = new LinkedList<>();
 
-    metrics.get().forEach((name, metric) -> {
+    producer.metrics().forEach((name, metric) -> {
       if (name.group().equals("producer-metrics")) {
         final String clientId = name.tags().get("client-id");
 

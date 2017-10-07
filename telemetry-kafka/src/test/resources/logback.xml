@@ -1,0 +1,12 @@
+<configuration packagingData="true">
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <withJansi>true</withJansi>
+    <encoder>
+      <pattern>%d{mm:ss.SSS} %highlight(%-5level) [%thread{16}] %cyan(%logger{36}) - %msg %mdc%n</pattern>
+    </encoder>
+  </appender>
+
+  <root level="${LOG_LEVEL:-debug}">
+    <appender-ref ref="STDOUT" />
+  </root>
+</configuration>

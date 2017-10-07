@@ -10,8 +10,9 @@ class Gauges {
   }
 
   static GaugeMetricFamily gauge(MetricName metricName, String... tags) {
+    final String name = "kafka_" + safe(metricName.group()) + "_" + safe(metricName.name());
     return new GaugeMetricFamily(
-        safe("kafka_" + metricName.group() + "_" + metricName.name()),
+        name,
         metricName.description(),
         Arrays.asList(tags));
   }
