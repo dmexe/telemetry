@@ -46,6 +46,7 @@ class HttpTracingContextTest extends TestEnv {
         IntStream.range(0, 3).forEach(n -> {
           client.request(get("/ping"));
           final HttpResponse response = client.response();
+          assertThat(response).isNotNull();
           assertThat(response.status().code()).isEqualTo(200);
           assertThat(response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH)).isEqualTo(4);
         });
@@ -103,6 +104,7 @@ class HttpTracingContextTest extends TestEnv {
       try (Client client = newClient(srv.address(), collectorRegistry, tracer)) {
         client.request(get("/server/error"));
         final HttpResponse response = client.response();
+        assertThat(response).isNotNull();
         assertThat(response.status().code()).isEqualTo(500);
         assertThat(response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH)).isEqualTo(0);
       }
@@ -161,6 +163,7 @@ class HttpTracingContextTest extends TestEnv {
       try (Client client = newClient(srv.address(), collectorRegistry, tracer)) {
         client.request(get("/ping"), root);
         final HttpResponse response = client.response();
+        assertThat(response).isNotNull();
         assertThat(response.status().code()).isEqualTo(200);
         assertThat(response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH)).isEqualTo(4);
       }
@@ -205,6 +208,7 @@ class HttpTracingContextTest extends TestEnv {
       try (Client client = newClient(srv.address(), collectorRegistry, tracer)) {
         client.request(get("/server/error"), root);
         final HttpResponse response = client.response();
+        assertThat(response).isNotNull();
         assertThat(response.status().code()).isEqualTo(500);
         assertThat(response.headers().getInt(HttpHeaderNames.CONTENT_LENGTH)).isEqualTo(0);
       }

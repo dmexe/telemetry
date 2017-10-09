@@ -26,11 +26,17 @@ public interface HttpTracingContext {
     channel.attr(SERVER_CURRENT_SPAN).set(span);
   }
 
+  @Nullable
+  static Span getServerCurrentSpan(Channel channel) {
+    return channel.attr(SERVER_CURRENT_SPAN).get();
+  }
+
   static void addClientParentContext(Channel channel, SpanContext spanParentContext) {
     channel.attr(CLIENT_PARENT_SPAN_CONTEXT).set(spanParentContext);
   }
 
-  static @Nullable SpanContext getClientParentContext(Channel channel) {
+  @Nullable
+  static SpanContext getClientParentContext(Channel channel) {
     return channel.attr(CLIENT_PARENT_SPAN_CONTEXT).get();
   }
 }
