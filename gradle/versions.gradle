@@ -13,4 +13,6 @@ ext {
   okhttp_version = "3.8.1"
   jetbrains_annotations_version = "15.0"
   kafka_version = "0.10.2.1"
+  jooq_version = "3.9.2"
+  hikari_version = "2.7.1"
 }

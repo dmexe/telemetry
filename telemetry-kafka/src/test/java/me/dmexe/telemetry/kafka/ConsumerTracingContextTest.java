@@ -59,7 +59,9 @@ class ConsumerTracingContextTest extends TestEnv {
     assertThat(tracer.finishedSpans()).isNotEmpty();
     final MockSpan span = tracer.finishedSpans().get(tracer.finishedSpans().size() - 1);
     assertThat(span.tags())
-        .containsOnlyKeys(
+        .containsEntry("component", "kafka")
+        .containsEntry("span.kind", "consumer")
+        .containsKeys(
             "kafka.key",
             "kafka.offset",
             "kafka.partition",

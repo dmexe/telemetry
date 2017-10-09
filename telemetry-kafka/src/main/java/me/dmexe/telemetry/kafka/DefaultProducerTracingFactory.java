@@ -1,5 +1,6 @@
 package me.dmexe.telemetry.kafka;
 
+import static me.dmexe.telemetry.kafka.Constants.COMPONENT_NAME;
 import static me.dmexe.telemetry.kafka.Constants.RECORD_KEY;
 import static me.dmexe.telemetry.kafka.Constants.RECORD_PARTITION;
 
@@ -53,6 +54,9 @@ class DefaultProducerTracingFactory implements ProducerTracingFactory {
     if (key != null) {
       RECORD_KEY.set(span, key.toString());
     }
+
+    Tags.COMPONENT.set(span, COMPONENT_NAME);
+    Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_PRODUCER);
 
     return new DefaultProducerTracingContext(span);
   }

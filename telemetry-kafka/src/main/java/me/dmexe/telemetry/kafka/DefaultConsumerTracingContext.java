@@ -1,5 +1,6 @@
 package me.dmexe.telemetry.kafka;
 
+import static me.dmexe.telemetry.kafka.Constants.COMPONENT_NAME;
 import static me.dmexe.telemetry.kafka.Constants.ERROR_KIND_LOG_NAME;
 import static me.dmexe.telemetry.kafka.Constants.ERROR_MESSAGE_LOG_NAME;
 import static me.dmexe.telemetry.kafka.Constants.MDC_KEY;
@@ -109,6 +110,8 @@ class DefaultConsumerTracingContext<K,V> implements ConsumerTracingContext<K,V> 
         .buildSpan("kafka.consume " + record.topic())
         .startManual();
 
+    Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_CONSUMER);
+    Tags.COMPONENT.set(span, COMPONENT_NAME);
     Tags.MESSAGE_BUS_DESTINATION.set(span, record.topic());
     RECORD_PARTITION.set(span, record.partition());
     RECORD_OFFSET.set(span, Long.toString(record.offset()));

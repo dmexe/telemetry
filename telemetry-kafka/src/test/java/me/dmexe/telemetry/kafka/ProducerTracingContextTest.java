@@ -35,13 +35,16 @@ class ProducerTracingContextTest extends TestEnv {
     assertThat(tracer.finishedSpans()).isNotEmpty();
 
     final MockSpan span = tracer.finishedSpans().get(tracer.finishedSpans().size() - 1);
-    assertThat(span.tags()).containsOnlyKeys(
-        "kafka.key",
-        "kafka.key_size",
-        "kafka.offset",
-        "kafka.partition",
-        "kafka.value_size",
-        "message_bus.destination");
+    assertThat(span.tags())
+        .containsEntry("component", "kafka")
+        .containsEntry("span.kind", "producer")
+        .containsKeys(
+            "kafka.key",
+            "kafka.key_size",
+            "kafka.offset",
+            "kafka.partition",
+            "kafka.value_size",
+            "message_bus.destination");
   }
 
   @Test
@@ -61,7 +64,7 @@ class ProducerTracingContextTest extends TestEnv {
     assertThat(tracer.finishedSpans()).isNotEmpty();
 
     final MockSpan span = tracer.finishedSpans().get(tracer.finishedSpans().size() - 1);
-    assertThat(span.tags()).containsOnlyKeys(
+    assertThat(span.tags()).containsKeys(
         "kafka.key",
         "kafka.key_size",
         "kafka.offset",

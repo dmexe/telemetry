@@ -4,6 +4,8 @@ import io.opentracing.tag.IntTag;
 import io.opentracing.tag.StringTag;
 
 class Constants {
+  static final String COMPONENT_NAME = "kafka";
+
   static final StringTag RECORD_OFFSET = new StringTag("kafka.offset");
   static final IntTag RECORD_PARTITION = new IntTag("kafka.partition");
   static final StringTag RECORD_KEY = new StringTag("kafka.key");
