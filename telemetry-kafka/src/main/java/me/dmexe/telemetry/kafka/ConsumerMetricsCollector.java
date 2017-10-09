@@ -6,11 +6,7 @@ import io.prometheus.client.Collector;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
-import org.apache.kafka.common.Metric;
-import org.apache.kafka.common.MetricName;
 
 public class ConsumerMetricsCollector extends Collector {
   private final MetricsProducer producer;
@@ -25,7 +21,6 @@ public class ConsumerMetricsCollector extends Collector {
     final List<MetricFamilySamples> samples = new LinkedList<>();
 
     producer.metrics().forEach((name, metric) -> {
-
       if (name.group().equals("consumer-metrics")) {
         final String clientId = name.tags().get("client-id");
         if (clientId != null) {

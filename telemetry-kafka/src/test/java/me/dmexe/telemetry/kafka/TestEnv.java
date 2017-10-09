@@ -1,5 +1,6 @@
 package me.dmexe.telemetry.kafka;
 
+import io.opentracing.mock.MockSpan;
 import io.prometheus.client.CollectorRegistry;
 import java.time.Duration;
 import java.util.Collections;
@@ -67,5 +68,16 @@ abstract class TestEnv {
     } catch (Exception err) {
       throw new RuntimeException(err);
     }
+  }
+
+  protected static List<String> logEntries(MockSpan mockSpan) {
+    return mockSpan.logEntries().stream()
+        .flatMap(it -> it
+            .fields()
+            .entrySet().stream()
+        )
+        .map(it -> it.getKey() + "=" + it.getValue())
+        .sorted()
+        .collect(Collectors.toList());
   }
 }

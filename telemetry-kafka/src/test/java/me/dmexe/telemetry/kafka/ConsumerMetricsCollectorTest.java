@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +44,8 @@ class ConsumerMetricsCollectorTest extends TestEnv {
       consumer.commitSync();
     }
 
-    assertThat(sampleKeys(collectorRegistry)).isNotEmpty();
+    assertThat(sampleKeys(collectorRegistry))
+        .isNotEmpty()
+        .areAtLeast(13, new Condition<>(s -> true, "true"));
   }
 }

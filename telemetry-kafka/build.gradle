@@ -18,4 +18,5 @@ dependencies {
   testCompileOnly "org.jetbrains:annotations:${jetbrains_annotations_version}"
 
   testCompile "ch.qos.logback:logback-classic:${logback_version}"
+  testCompile "io.opentracing:opentracing-mock:${opentracing_version}"
 }

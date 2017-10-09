@@ -6,11 +6,7 @@ import io.prometheus.client.Collector;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Supplier;
-import org.apache.kafka.common.Metric;
-import org.apache.kafka.common.MetricName;
 
 public class ProducerMetricsCollector extends Collector {
   private final MetricsProducer producer;
