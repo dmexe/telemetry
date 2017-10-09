@@ -3,12 +3,12 @@ package me.dmexe.telemetry.kafka;
 import io.opentracing.Tracer;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-public interface ConsumerTracingFactory {
-  ConsumerTracingFactory tracer(Tracer tracer);
+public interface ConsumerTracingFactory<K,V> {
+  ConsumerTracingFactory<K,V> tracer(Tracer tracer);
 
-  ConsumerTracingContext create(ConsumerRecord<?,?> record);
+  ConsumerTracingContext<K,V> create(ConsumerRecord<K,V> record);
 
-  static ConsumerTracingFactory newFactory() {
-    return new DefaultConsumerTracingFactory();
+  static <K,V> ConsumerTracingFactory<K,V> newFactory(Class<K> keyClass, Class<V> valueClass) {
+    return new DefaultConsumerTracingFactory<>();
   }
 }
