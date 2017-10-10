@@ -34,6 +34,16 @@ public class PooledByteBufAllocatorCollector extends Collector {
   }
 
   /**
+   * Check that given name already registered in the watch list.
+   *
+   * @param name allocator name.
+   * @return true al allocator already registered.
+   */
+  public static boolean contains(String name) {
+    return refs.containsKey(name);
+  }
+
+  /**
    * Remove a {@link PooledByteBufAllocator} from the watch list.
    *
    * @param  name a name of {@link PooledByteBufAllocator}
