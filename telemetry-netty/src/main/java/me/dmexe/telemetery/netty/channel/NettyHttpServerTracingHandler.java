@@ -63,10 +63,8 @@ public class NettyHttpServerTracingHandler extends ChannelDuplexHandler {
 
     if (msg instanceof LastHttpContent && !isContinueResponse(msg)) {
       if (nextState(State.COMPLETED)) {
-        promise.addListener(future -> {
-          stats.completed();
-          nextState(State.IDLE);
-        });
+        stats.completed();
+        nextState(State.IDLE);
       }
     }
 
