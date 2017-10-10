@@ -2,6 +2,7 @@ package me.dmexe.telemetry.kafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import io.opentracing.ActiveSpan;
 import io.opentracing.mock.MockSpan;
 import io.opentracing.mock.MockTracer;
 import io.opentracing.util.ThreadLocalActiveSpanSource;
@@ -25,7 +26,10 @@ class KafkaProducerTracingContextTest extends TestEnv {
 
   @Test
   void should_handle_record() throws Exception {
-    try(KafkaProducer<String,String> producer = newProducer()) {
+    final MockSpan root = tracer.buildSpan("root").startManual();
+
+    try(ActiveSpan ignored = tracer.makeActive(root);
+        KafkaProducer<String,String> producer = newProducer()) {
       final ProducerRecord<String,String> record =
           new ProducerRecord<>(topic, "key", "value");
       final KafkaProducerTracingContext ctx = tracingFactory.create(record);
@@ -34,7 +38,7 @@ class KafkaProducerTracingContextTest extends TestEnv {
 
     assertThat(tracer.finishedSpans()).isNotEmpty();
 
-    final MockSpan span = tracer.finishedSpans().get(tracer.finishedSpans().size() - 1);
+    final MockSpan span = tracer.finishedSpans().get(0);
     assertThat(span.tags())
         .containsEntry("component", "kafka")
         .containsEntry("span.kind", "producer")
@@ -45,13 +49,18 @@ class KafkaProducerTracingContextTest extends TestEnv {
             "kafka.partition",
             "kafka.value_size",
             "message_bus.destination");
+
+    assertThat(root.context().traceId())
+        .isEqualTo(span.context().traceId());
   }
 
   @Test
   void should_handle_record_with_callback() throws Exception {
     final AtomicBoolean callback = new AtomicBoolean(false);
+    final MockSpan root = tracer.buildSpan("root").startManual();
 
-    try(KafkaProducer<String,String> producer = newProducer()) {
+    try(ActiveSpan ignored = tracer.makeActive(root);
+        KafkaProducer<String,String> producer = newProducer()) {
       final ProducerRecord<String,String> record =
           new ProducerRecord<>(topic, "key", "value");
       final KafkaProducerTracingContext ctx = tracingFactory.create(record);
@@ -63,7 +72,7 @@ class KafkaProducerTracingContextTest extends TestEnv {
     assertThat(callback.get()).isTrue();
     assertThat(tracer.finishedSpans()).isNotEmpty();
 
-    final MockSpan span = tracer.finishedSpans().get(tracer.finishedSpans().size() - 1);
+    final MockSpan span = tracer.finishedSpans().get(0);
     assertThat(span.tags()).containsKeys(
         "kafka.key",
         "kafka.key_size",
@@ -71,5 +80,19 @@ class KafkaProducerTracingContextTest extends TestEnv {
         "kafka.partition",
         "kafka.value_size",
         "message_bus.destination");
+    assertThat(root.context().traceId())
+        .isEqualTo(span.context().traceId());
+  }
+
+  @Test
+  void should_handle_with_no_op_context() throws Exception {
+    try(KafkaProducer<String,String> producer = newProducer()) {
+      final ProducerRecord<String,String> record =
+          new ProducerRecord<>(topic, "key", "value");
+      final KafkaProducerTracingContext ctx = tracingFactory.create(record);
+      producer.send(record, ctx.callback()).get(3, TimeUnit.SECONDS);
+    }
+
+    assertThat(tracer.finishedSpans()).isEmpty();
   }
 }

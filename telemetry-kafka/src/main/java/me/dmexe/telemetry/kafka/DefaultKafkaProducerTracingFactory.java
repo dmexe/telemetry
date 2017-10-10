@@ -4,6 +4,7 @@ import static me.dmexe.telemetry.kafka.KafkaConstants.COMPONENT_NAME;
 import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_KEY;
 import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_PARTITION;
 
+import io.opentracing.ActiveSpan;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.tag.Tags;
@@ -36,8 +37,14 @@ class DefaultKafkaProducerTracingFactory implements KafkaProducerTracingFactory 
       tracer = this.tracer;
     }
 
+    final ActiveSpan parent = tracer.activeSpan();
+    if (parent == null) {
+      return new NoopKafkaProducerTracingContext();
+    }
+
     final Span span = tracer
         .buildSpan("kafka.send")
+        .asChildOf(parent)
         .startManual();
 
     final String topic = record.topic();
