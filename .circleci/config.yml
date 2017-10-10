@@ -3,8 +3,55 @@
 # Check https://circleci.com/docs/2.0/language-java/ for more details
 #
 version: 2
+
+shared: &shared
+  working_directory: ~/repo
+
+  environment:
+    JVM_OPTS: -Xmx3200m
+    TERM: dumb
+
+  steps:
+    - checkout
+
+    - restore_cache:
+        keys:
+        - v3-dependencies-{{ .Environment.CIRCLE_STAGE }}-{{ checksum "gradle/versions.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}
+
+    - run: gradle downloadDependencies
+
+    - save_cache:
+        paths:
+          - ~/.gradle
+        key: v3-dependencies-{{ .Environment.CIRCLE_STAGE }}-{{ checksum "gradle/versions.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}
+
+    - run:
+        name: Wait for Kafka
+        command: dockerize -wait tcp://localhost:9092 -timeout 1m
+
+    - run:
+        name: Wait for MySql
+        command: dockerize -wait tcp://localhost:3306 -timeout 1m
+
+    - run: gradle build
+
+    - store_test_results:
+        path: telemetry-netty/build/test-results/junit-platform
+
+    - store_test_results:
+        path: telemetry-kafka/build/test-results/junit-platform
+
+    - store_artifacts:
+        path: telemetry-netty/build/reports
+        destination: netty-reports
+
+    - store_artifacts:
+        path: telemetry-kafka/build/reports
+        destination: kafka-reports
+
 jobs:
-  build:
+  java8:
+    <<: *shared
     docker:
       - image: circleci/openjdk:8-jdk
       - image: zookeeper:3.4
@@ -17,47 +64,24 @@ jobs:
         environment:
           MYSQL_ROOT_PASSWORD: "root"
 
-    working_directory: ~/repo
+  java9:
+    <<: *shared
+    docker:
+      - image: circleci/openjdk:9-jdk
+      - image: zookeeper:3.4
+      - image: wurstmeister/kafka:0.10.2.0
+        environment:
+          KAFKA_ZOOKEEPER_CONNECT: "localhost:2181"
+          KAFKA_ADVERTISED_HOST_NAME: "localhost"
+          KAFKA_ADVERTISED_PORT: "9092"
+      - image: mariadb:10.1
+        environment:
+          MYSQL_ROOT_PASSWORD: "root"
 
-    environment:
-      JVM_OPTS: -Xmx3200m
-      TERM: dumb
-
-    steps:
-      - checkout
-
-      - restore_cache:
-          keys:
-          - v3-dependencies-{{ checksum "gradle/versions.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}
-
-      - run: gradle downloadDependencies
-
-      - save_cache:
-          paths:
-            - ~/.gradle
-          key: v3-dependencies-{{ checksum "gradle/versions.gradle" }}-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}-{{ checksum "build.gradle" }}
-
-      - run:
-          name: Wait for Kafka
-          command: dockerize -wait tcp://localhost:9092 -timeout 1m
-
-      - run:
-          name: Wait for MySql
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
-
-      - run: gradle build
-
-      - store_test_results:
-          path: telemetry-netty/build/test-results/junit-platform
-
-      - store_test_results:
-          path: telemetry-kafka/build/test-results/junit-platform
-
-      - store_artifacts:
-          path: telemetry-netty/build/reports
-          destination: netty-reports
-
-      - store_artifacts:
-          path: telemetry-kafka/build/reports
-          destination: kafka-reports
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+    - java8
+    - java9
 
