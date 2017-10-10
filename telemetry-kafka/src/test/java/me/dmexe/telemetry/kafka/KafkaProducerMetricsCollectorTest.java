@@ -10,9 +10,9 @@ import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ProducerMetricsCollectorTest extends TestEnv {
+class KafkaProducerMetricsCollectorTest extends TestEnv {
   private CollectorRegistry collectorRegistry;
-  private final String topic = ProducerMetricsCollectorTest.class.getSimpleName();
+  private final String topic = KafkaProducerMetricsCollectorTest.class.getSimpleName();
 
   @BeforeEach
   void before() {
@@ -23,7 +23,7 @@ class ProducerMetricsCollectorTest extends TestEnv {
   void should_collect_metrics() {
 
     try (KafkaProducer<String,String> producer = newProducer()) {
-      new ProducerMetricsCollector(producer::metrics).register(collectorRegistry);
+      new KafkaProducerMetricsCollector(producer::metrics).register(collectorRegistry);
       IntStream.range(0, 10).forEach(n ->
         sendAndWait(producer, topic, "key", "value")
       );

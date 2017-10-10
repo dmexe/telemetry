@@ -4,7 +4,7 @@ import io.prometheus.client.GaugeMetricFamily;
 import java.util.Arrays;
 import org.apache.kafka.common.MetricName;
 
-class Gauges {
+class GaugesFactory {
   private static String safe(String value) {
     return value.replace("-", "_");
   }

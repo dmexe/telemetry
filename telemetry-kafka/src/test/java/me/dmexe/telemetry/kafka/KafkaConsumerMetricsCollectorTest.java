@@ -13,9 +13,9 @@ import org.assertj.core.api.Condition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ConsumerMetricsCollectorTest extends TestEnv {
+class KafkaConsumerMetricsCollectorTest extends TestEnv {
   private CollectorRegistry collectorRegistry;
-  private final String topic = ConsumerMetricsCollectorTest.class.getSimpleName();
+  private final String topic = KafkaConsumerMetricsCollectorTest.class.getSimpleName();
   private final Duration subscribeTimeout = Duration.ofSeconds(30);
 
   @BeforeEach
@@ -29,7 +29,7 @@ class ConsumerMetricsCollectorTest extends TestEnv {
         KafkaProducer<String, String> producer = newProducer();
         KafkaConsumer<String, String> consumer = newConsumer()) {
 
-      new ConsumerMetricsCollector(consumer::metrics).register(collectorRegistry);
+      new KafkaConsumerMetricsCollector(consumer::metrics).register(collectorRegistry);
       consumer.subscribe(newArrayList(topic));
 
       IntStream.range(0, 10).forEach(n -> {

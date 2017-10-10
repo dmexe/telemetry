@@ -16,16 +16,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 
-class ConsumerTracingContextTest extends TestEnv {
+class KafkaConsumerTracingContextTest extends TestEnv {
   private MockTracer tracer;
-  private ConsumerTracingFactory<String,String> tracingFactory;
-  private final String topic = ConsumerMetricsCollectorTest.class.getSimpleName();
+  private KafkaConsumerTracingFactory<String,String> tracingFactory;
+  private final String topic = KafkaConsumerMetricsCollectorTest.class.getSimpleName();
   private final Duration subscribeTimeout = Duration.ofSeconds(30);
 
   @BeforeEach
   void before() {
     tracer = new MockTracer(new ThreadLocalActiveSpanSource());
-    tracingFactory = ConsumerTracingFactory.newFactory(String.class, String.class).tracer(tracer);
+    tracingFactory = KafkaConsumerTracingFactory.newFactory(String.class, String.class).tracer(tracer);
   }
 
   @Test
@@ -42,7 +42,7 @@ class ConsumerTracingContextTest extends TestEnv {
         assertThat(records).isNotEmpty();
 
         for (ConsumerRecord<String,String> record : records) {
-          final ConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
+          final KafkaConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
           assertThat(ctx.mdc())
               .isNotEmpty()
               .containsEntry("kafka:topic", record.topic())
@@ -82,7 +82,7 @@ class ConsumerTracingContextTest extends TestEnv {
         assertThat(records).isNotEmpty();
 
         for (ConsumerRecord<String,String> record : records) {
-          final ConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
+          final KafkaConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
           ctx.handleException(new RuntimeException("boom"));
           ctx.span().finish();
         }
@@ -113,7 +113,7 @@ class ConsumerTracingContextTest extends TestEnv {
         assertThat(records).isNotEmpty();
 
         for (ConsumerRecord<String,String> record : records) {
-          final ConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
+          final KafkaConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
           ctx
               .decorateConsumer(rec -> {
                 assertThat(MDC.getCopyOfContextMap())
@@ -150,7 +150,7 @@ class ConsumerTracingContextTest extends TestEnv {
         assertThat(records).isNotEmpty();
 
         for (ConsumerRecord<String,String> record : records) {
-          final ConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
+          final KafkaConsumerTracingContext<String,String> ctx = tracingFactory.create(record);
           final boolean res = ctx
               .decorateFunction(rec -> {
                 assertThat(MDC.getCopyOfContextMap())

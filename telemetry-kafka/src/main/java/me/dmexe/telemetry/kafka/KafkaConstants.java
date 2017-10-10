@@ -3,7 +3,7 @@ package me.dmexe.telemetry.kafka;
 import io.opentracing.tag.IntTag;
 import io.opentracing.tag.StringTag;
 
-class Constants {
+class KafkaConstants {
   static final String COMPONENT_NAME = "kafka";
 
   static final StringTag RECORD_OFFSET = new StringTag("kafka.offset");

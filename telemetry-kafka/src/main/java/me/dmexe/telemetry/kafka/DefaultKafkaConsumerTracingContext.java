@@ -1,15 +1,15 @@
 package me.dmexe.telemetry.kafka;
 
-import static me.dmexe.telemetry.kafka.Constants.COMPONENT_NAME;
-import static me.dmexe.telemetry.kafka.Constants.ERROR_KIND_LOG_NAME;
-import static me.dmexe.telemetry.kafka.Constants.ERROR_MESSAGE_LOG_NAME;
-import static me.dmexe.telemetry.kafka.Constants.MDC_KEY;
-import static me.dmexe.telemetry.kafka.Constants.MDC_OFFSET;
-import static me.dmexe.telemetry.kafka.Constants.MDC_PARTITION;
-import static me.dmexe.telemetry.kafka.Constants.MDC_TOPIC;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_KEY;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_OFFSET;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_PARTITION;
+import static me.dmexe.telemetry.kafka.KafkaConstants.COMPONENT_NAME;
+import static me.dmexe.telemetry.kafka.KafkaConstants.ERROR_KIND_LOG_NAME;
+import static me.dmexe.telemetry.kafka.KafkaConstants.ERROR_MESSAGE_LOG_NAME;
+import static me.dmexe.telemetry.kafka.KafkaConstants.MDC_KEY;
+import static me.dmexe.telemetry.kafka.KafkaConstants.MDC_OFFSET;
+import static me.dmexe.telemetry.kafka.KafkaConstants.MDC_PARTITION;
+import static me.dmexe.telemetry.kafka.KafkaConstants.MDC_TOPIC;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_KEY;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_OFFSET;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_PARTITION;
 
 import io.opentracing.ActiveSpan;
 import io.opentracing.Span;
@@ -25,13 +25,13 @@ import java.util.function.Supplier;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.MDC;
 
-class DefaultConsumerTracingContext<K,V> implements ConsumerTracingContext<K,V> {
+class DefaultKafkaConsumerTracingContext<K,V> implements KafkaConsumerTracingContext<K,V> {
   private final ConsumerRecord<K,V> record;
   private final Tracer tracer;
   private final Span span;
   private final Map<String,String> mdc;
 
-  DefaultConsumerTracingContext(Tracer tracer, ConsumerRecord<K,V> record) {
+  DefaultKafkaConsumerTracingContext(Tracer tracer, ConsumerRecord<K,V> record) {
     Objects.requireNonNull(tracer, "tracer cannot be null");
     Objects.requireNonNull(record, "record cannot be null");
     this.tracer = tracer;

@@ -6,24 +6,24 @@ import java.util.Objects;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.jetbrains.annotations.Nullable;
 
-class DefaultConsumerTracingFactory<K,V> implements ConsumerTracingFactory<K,V> {
+class DefaultKafkaConsumerTracingFactory<K,V> implements KafkaConsumerTracingFactory<K,V> {
 
   @Nullable
   private Tracer tracer;
 
-  DefaultConsumerTracingFactory() {
+  DefaultKafkaConsumerTracingFactory() {
     this.tracer = null;
   }
 
   @Override
-  public ConsumerTracingFactory<K,V> tracer(Tracer tracer) {
+  public KafkaConsumerTracingFactory<K,V> tracer(Tracer tracer) {
     Objects.requireNonNull(tracer, "tracer cannot be null");
     this.tracer = tracer;
     return this;
   }
 
   @Override
-  public ConsumerTracingContext<K,V> create(ConsumerRecord<K, V> record) {
+  public KafkaConsumerTracingContext<K,V> create(ConsumerRecord<K, V> record) {
     Objects.requireNonNull(record, "record cannot be null");
 
     Tracer tracer;
@@ -33,6 +33,6 @@ class DefaultConsumerTracingFactory<K,V> implements ConsumerTracingFactory<K,V> 
       tracer = this.tracer;
     }
 
-    return new DefaultConsumerTracingContext<>(tracer, record);
+    return new DefaultKafkaConsumerTracingContext<>(tracer, record);
   }
 }

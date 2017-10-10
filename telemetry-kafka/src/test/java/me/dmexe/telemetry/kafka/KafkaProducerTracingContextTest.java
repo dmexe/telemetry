@@ -12,15 +12,15 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ProducerTracingContextTest extends TestEnv {
+class KafkaProducerTracingContextTest extends TestEnv {
   private MockTracer tracer;
-  private ProducerTracingFactory tracingFactory;
-  private final String topic = ConsumerMetricsCollectorTest.class.getSimpleName();
+  private KafkaProducerTracingFactory tracingFactory;
+  private final String topic = KafkaConsumerMetricsCollectorTest.class.getSimpleName();
 
   @BeforeEach
   void before() {
     tracer = new MockTracer(new ThreadLocalActiveSpanSource());
-    tracingFactory = ProducerTracingFactory.newFactory().tracer(tracer);
+    tracingFactory = KafkaProducerTracingFactory.newFactory().tracer(tracer);
   }
 
   @Test
@@ -28,7 +28,7 @@ class ProducerTracingContextTest extends TestEnv {
     try(KafkaProducer<String,String> producer = newProducer()) {
       final ProducerRecord<String,String> record =
           new ProducerRecord<>(topic, "key", "value");
-      final ProducerTracingContext ctx = tracingFactory.create(record);
+      final KafkaProducerTracingContext ctx = tracingFactory.create(record);
       producer.send(record, ctx.callback()).get(3, TimeUnit.SECONDS);
     }
 
@@ -54,7 +54,7 @@ class ProducerTracingContextTest extends TestEnv {
     try(KafkaProducer<String,String> producer = newProducer()) {
       final ProducerRecord<String,String> record =
           new ProducerRecord<>(topic, "key", "value");
-      final ProducerTracingContext ctx = tracingFactory.create(record);
+      final KafkaProducerTracingContext ctx = tracingFactory.create(record);
       producer
           .send(record, ctx.callback((meta, err) -> callback.set(true)))
           .get(3, TimeUnit.SECONDS);

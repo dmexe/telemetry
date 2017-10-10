@@ -1,11 +1,11 @@
 package me.dmexe.telemetry.kafka;
 
-import static me.dmexe.telemetry.kafka.Constants.ERROR_KIND_LOG_NAME;
-import static me.dmexe.telemetry.kafka.Constants.ERROR_MESSAGE_LOG_NAME;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_KEY_SIZE;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_OFFSET;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_PARTITION;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_VALUE_SIZE;
+import static me.dmexe.telemetry.kafka.KafkaConstants.ERROR_KIND_LOG_NAME;
+import static me.dmexe.telemetry.kafka.KafkaConstants.ERROR_MESSAGE_LOG_NAME;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_KEY_SIZE;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_OFFSET;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_PARTITION;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_VALUE_SIZE;
 
 import io.opentracing.Span;
 import io.opentracing.tag.Tags;
@@ -15,10 +15,10 @@ import java.util.Objects;
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.RecordMetadata;
 
-class DefaultProducerTracingContext implements ProducerTracingContext {
+class DefaultKafkaProducerTracingContext implements KafkaProducerTracingContext {
   private final Span span;
 
-  DefaultProducerTracingContext(Span span) {
+  DefaultKafkaProducerTracingContext(Span span) {
     Objects.requireNonNull(span, "span cannot be null");
     this.span = span;
   }

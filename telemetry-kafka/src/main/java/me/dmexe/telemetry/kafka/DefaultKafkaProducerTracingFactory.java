@@ -1,8 +1,8 @@
 package me.dmexe.telemetry.kafka;
 
-import static me.dmexe.telemetry.kafka.Constants.COMPONENT_NAME;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_KEY;
-import static me.dmexe.telemetry.kafka.Constants.RECORD_PARTITION;
+import static me.dmexe.telemetry.kafka.KafkaConstants.COMPONENT_NAME;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_KEY;
+import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_PARTITION;
 
 import io.opentracing.Span;
 import io.opentracing.Tracer;
@@ -12,23 +12,23 @@ import java.util.Objects;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.jetbrains.annotations.Nullable;
 
-class DefaultProducerTracingFactory implements ProducerTracingFactory {
+class DefaultKafkaProducerTracingFactory implements KafkaProducerTracingFactory {
 
   @Nullable
   private Tracer tracer;
 
-  DefaultProducerTracingFactory() {
+  DefaultKafkaProducerTracingFactory() {
   }
 
   @Override
-  public ProducerTracingFactory tracer(Tracer tracer) {
+  public KafkaProducerTracingFactory tracer(Tracer tracer) {
     Objects.requireNonNull(tracer, "tracer cannot be null");
     this.tracer = tracer;
     return this;
   }
 
   @Override
-  public ProducerTracingContext create(ProducerRecord<?, ?> record) {
+  public KafkaProducerTracingContext create(ProducerRecord<?, ?> record) {
     Tracer tracer;
     if (this.tracer == null) {
       tracer = GlobalTracer.get();
@@ -58,6 +58,6 @@ class DefaultProducerTracingFactory implements ProducerTracingFactory {
     Tags.COMPONENT.set(span, COMPONENT_NAME);
     Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_PRODUCER);
 
-    return new DefaultProducerTracingContext(span);
+    return new DefaultKafkaProducerTracingContext(span);
   }
 }
