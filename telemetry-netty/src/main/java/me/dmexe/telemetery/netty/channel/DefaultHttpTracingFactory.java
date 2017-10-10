@@ -54,6 +54,9 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
 
   /**
    * Assign a {@link CollectorRegistry}, it's only for testing.
+   *
+   * @param collectorRegistry override default collector registry.
+   * @return the factory.
    */
   public DefaultHttpTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
@@ -64,6 +67,9 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
 
   /**
    * Assign a {@link Ticker}, it's only for testing.
+   *
+   * @param ticker override ticker.
+   * @return the factory.
    */
   public DefaultHttpTracingFactory ticker(Ticker ticker) {
     Objects.requireNonNull(ticker, "ticker cannot be null");
