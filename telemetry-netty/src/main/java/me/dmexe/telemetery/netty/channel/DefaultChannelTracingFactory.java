@@ -89,6 +89,9 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
 
   /**
    * Assign a {@link CollectorRegistry}, it's only for testing.
+   *
+   * @param collectorRegistry override default connector registry.
+   * @return the factory.
    */
   public DefaultChannelTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
@@ -99,6 +102,9 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
 
   /**
    * Assign a {@link Ticker}, it's only for testing.
+   *
+   * @param ticker override default ticker.
+   * @return the factory.
    */
   public DefaultChannelTracingFactory ticker(Ticker ticker) {
     Objects.requireNonNull(ticker, "ticker cannot be null");

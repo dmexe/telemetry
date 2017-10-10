@@ -16,7 +16,8 @@ import org.slf4j.LoggerFactory;
 
 /**
  * There is a state machine for HTTP request/response cycle. Handles transition
- * between IDLE -> REQUEST_SEND -> RESPONSE_RECEIVED -> COMPLETED -> IDLE states.
+ * between IDLE -{@literal >} REQUEST_SEND -{@literal >} RESPONSE_RECEIVED -{@literal >}
+ * COMPLETED -{@literal >} IDLE states.
  */
 class HttpClientTracingHandler extends ChannelDuplexHandler {
   private static final Logger log = LoggerFactory.getLogger(HttpClientTracingHandler.class);

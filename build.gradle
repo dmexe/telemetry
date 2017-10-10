@@ -17,6 +17,13 @@ buildscript {
   }
 }
 
+allprojects {
+  group = "com.github.dmexe"
+  version = project.hasProperty('project.version') ?
+      project.getProperty('project.version') :
+      new File("${rootProject.rootDir}/VERSION").text.trim()
+}
+
 subprojects {
   apply from: "../gradle/junit.gradle"
   apply from: "../gradle/checks.gradle"

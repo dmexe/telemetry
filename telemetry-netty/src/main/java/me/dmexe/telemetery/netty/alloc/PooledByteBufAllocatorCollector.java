@@ -23,6 +23,9 @@ public class PooledByteBufAllocatorCollector extends Collector {
 
   /**
    * Register and collect metrics for a {@link PooledByteBufAllocator} alloc.
+   *
+   * @param name the allocator identifier
+   * @param alloc the allocator instance
    */
   public static void add(String name, PooledByteBufAllocator alloc) {
     Objects.requireNonNull(name, "name cannot be null");
