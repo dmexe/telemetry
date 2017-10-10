@@ -59,14 +59,14 @@ class DefaultJooqTracingFactory implements JooqTracingFactory {
       tracer = this.tracer;
     }
 
-    TracingExecuteListener listener;
+    JooqTracingExecuteListener listener;
     if (this.collectorRegistry == null) {
-      listener = new TracingExecuteListener(
+      listener = new JooqTracingExecuteListener(
           tracer,
           Lazy.total,
           Lazy.latency);
     } else {
-      listener = new TracingExecuteListener(
+      listener = new JooqTracingExecuteListener(
           tracer,
           totalBuilder.register(collectorRegistry),
           latencyBuilder.register(collectorRegistry));

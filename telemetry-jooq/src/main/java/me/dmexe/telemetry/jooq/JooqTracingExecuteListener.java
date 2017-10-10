@@ -1,7 +1,5 @@
 package me.dmexe.telemetry.jooq;
 
-import static me.dmexe.telemetry.jooq.Constants.NULL_NANO;
-
 import io.opentracing.ActiveSpan;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
@@ -13,16 +11,13 @@ import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 import org.jooq.ExecuteContext;
 
-class TracingExecuteListener {
+class JooqTracingExecuteListener {
+  private static final String DATA_KEY = JooqTracingExecuteListener.class.getName();
   private final Counter total;
   private final Histogram latency;
   private final Tracer tracer;
-  private long startTime = NULL_NANO;
 
-  @Nullable
-  private Span span;
-
-  TracingExecuteListener(Tracer tracer, Counter total, Histogram latency) {
+  JooqTracingExecuteListener(Tracer tracer, Counter total, Histogram latency) {
     Objects.requireNonNull(total, "total cannot be null");
     Objects.requireNonNull(latency, "latency cannot be null");
     Objects.requireNonNull(tracer, "tracer cannot be null");
@@ -32,25 +27,31 @@ class TracingExecuteListener {
   }
 
   void onStart(ExecuteContext ctx) {
-    this.span = buildSpan(ctx);
-    this.startTime = System.nanoTime();
+    final Span span = buildSpan(ctx);
+    final long startTime = System.nanoTime();
+    final ContextData contextData = new ContextData(span, startTime);
+    ctx.data(DATA_KEY, contextData);
   }
 
   void onEnd(ExecuteContext ctx) {
-    if (this.span != null) {
-      if (ctx.sql() != null) {
-        Tags.DB_STATEMENT.set(span, ctx.sql());
-      }
-      span.finish();
-      this.span = null;
+    final Object data = ctx.data(DATA_KEY);
+    if (data == null || !(data instanceof ContextData)) {
+      return;
     }
 
-    if (startTime != NULL_NANO) {
-      long endTime = System.nanoTime();
-      String opName = ctx.type().name();
-      total.labels(opName).inc();
-      latency.labels(opName).observe(SimpleTimer.elapsedSecondsFromNanos(startTime, endTime));
-      this.startTime = NULL_NANO;
+    final ContextData contextData = (ContextData) data;
+
+    long endTime = System.nanoTime();
+    String opName = ctx.type().name();
+    total.labels(opName).inc();
+    final double elapsed = SimpleTimer.elapsedSecondsFromNanos(contextData.startTime, endTime);
+    latency.labels(opName).observe(elapsed);
+
+    if (contextData.span != null) {
+      if (ctx.sql() != null) {
+        Tags.DB_STATEMENT.set(contextData.span, ctx.sql());
+      }
+      contextData.span.finish();
     }
   }
 
@@ -68,5 +69,15 @@ class TracingExecuteListener {
         .withTag(Tags.SPAN_KIND.getKey(), Tags.SPAN_KIND_CLIENT)
         .asChildOf(parent)
         .startManual();
+  }
+
+  private static class ContextData {
+    private final Span span;
+    private final long startTime;
+
+    ContextData(@Nullable Span span, long startTime) {
+      this.span = span;
+      this.startTime = startTime;
+    }
   }
 }

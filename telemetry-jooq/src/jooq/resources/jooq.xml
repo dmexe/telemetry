@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.9.2.xsd">
+  <!-- Configure the database connection here -->
+  <jdbc>
+    <driver>com.mysql.cj.jdbc.Driver</driver>
+    <url>jdbc:mysql://localhost:3306/telemetry_jooq</url>
+    <user>root</user>
+    <password>root</password>
+  </jdbc>
+
+  <generator>
+    <name>org.jooq.util.JavaGenerator</name>
+    <database>
+      <name>org.jooq.util.mysql.MySQLDatabase</name>
+
+      <inputSchema>telemetry_jooq</inputSchema>
+      <outputSchema>root</outputSchema>
+
+      <forcedTypes>
+        <forcedType>
+          <name>UUID</name>
+          <expression>^(uuid)$</expression>
+          <types>CHAR\(36\)</types>
+        </forcedType>
+      </forcedTypes>
+    </database>
+
+    <target>
+      <packageName>me.dmexe.telemetry.jooq</packageName>
+      <directory>src/jooq/java</directory>
+    </target>
+  </generator>
+</configuration>
