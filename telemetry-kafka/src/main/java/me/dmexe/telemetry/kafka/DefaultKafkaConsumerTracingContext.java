@@ -62,6 +62,11 @@ class DefaultKafkaConsumerTracingContext<K,V> implements KafkaConsumerTracingCon
   }
 
   @Override
+  public void finish() {
+    span.finish();
+  }
+
+  @Override
   public Runnable decorateConsumer(Consumer<ConsumerRecord<K, V>> consumer) {
     return () -> {
       MDC.setContextMap(mdc);

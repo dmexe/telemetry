@@ -14,6 +14,8 @@ public interface KafkaConsumerTracingContext<K,V> {
 
   void handleException(Throwable err);
 
+  void finish();
+
   Runnable decorateConsumer(Consumer<ConsumerRecord<K,V>> consumer);
 
   <T> Supplier<T> decorateFunction(Function<ConsumerRecord<K,V>, T> func);

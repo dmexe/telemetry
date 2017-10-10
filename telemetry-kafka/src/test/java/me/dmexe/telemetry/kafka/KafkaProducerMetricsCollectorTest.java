@@ -54,11 +54,11 @@ class KafkaProducerMetricsCollectorTest extends TestEnv {
               "kafka_producer_metrics_request_latency_max{test-client}",
               "kafka_producer_metrics_requests_in_flight{test-client}",
               "kafka_producer_metrics_waiting_threads{test-client}",
-              "kafka_producer_topic_metrics_byte_rate{test-client,ProducerMetricsCollectorTest}",
-              "kafka_producer_topic_metrics_compression_rate{test-client,ProducerMetricsCollectorTest}",
-              "kafka_producer_topic_metrics_record_error_rate{test-client,ProducerMetricsCollectorTest}",
-              "kafka_producer_topic_metrics_record_retry_rate{test-client,ProducerMetricsCollectorTest}",
-              "kafka_producer_topic_metrics_record_send_rate{test-client,ProducerMetricsCollectorTest}");
+              "kafka_producer_topic_metrics_byte_rate{test-client,KafkaProducerMetricsCollectorTest}",
+              "kafka_producer_topic_metrics_compression_rate{test-client,KafkaProducerMetricsCollectorTest}",
+              "kafka_producer_topic_metrics_record_error_rate{test-client,KafkaProducerMetricsCollectorTest}",
+              "kafka_producer_topic_metrics_record_retry_rate{test-client,KafkaProducerMetricsCollectorTest}",
+              "kafka_producer_topic_metrics_record_send_rate{test-client,KafkaProducerMetricsCollectorTest}");
     });
   }
 }
