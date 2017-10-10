@@ -1,11 +1,11 @@
 package me.dmexe.telemetery.netty.channel;
 
-import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_RECEIVE_LOG_NAME;
-import static me.dmexe.telemetery.netty.channel.Constants.ERROR_KIND_LOG_NAME;
-import static me.dmexe.telemetery.netty.channel.Constants.ERROR_MESSAGE_LOG_NAME;
-import static me.dmexe.telemetery.netty.channel.Constants.HTTP_COMPONENT_NAME;
-import static me.dmexe.telemetery.netty.channel.Constants.HTTP_CONTENT_LENGTH;
-import static me.dmexe.telemetery.netty.channel.Constants.HTTP_CONTENT_TYPE;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.CLIENT_RECEIVE_LOG_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_KIND_LOG_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_MESSAGE_LOG_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_COMPONENT_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_LENGTH;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_TYPE;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
-class DefaultHttpClientTracingContext implements HttpTracingContext {
+class DefaultNettyHttpClientTracingContext implements NettyHttpTracingContext {
   private static final long NULL_NANO = -1L;
 
   private final String address;
@@ -45,7 +45,7 @@ class DefaultHttpClientTracingContext implements HttpTracingContext {
   @Nullable
   private String code;
 
-  DefaultHttpClientTracingContext(
+  DefaultNettyHttpClientTracingContext(
       String address,
       Tracer tracer,
       Ticker ticker,
@@ -72,7 +72,7 @@ class DefaultHttpClientTracingContext implements HttpTracingContext {
     requestStartTimeNanos = ticker.nanoTime();
     method = request.method();
 
-    final SpanContext spanContext = HttpTracingContext.getClientParentContext(channel);
+    final SpanContext spanContext = NettyHttpTracingContext.getClientParentContext(channel);
     if (spanContext != null) {
       span = tracer
           .buildSpan("http." + request.method().name())
@@ -81,7 +81,7 @@ class DefaultHttpClientTracingContext implements HttpTracingContext {
     }
 
     if (span != null) {
-      tracer.inject(span.context(), Builtin.HTTP_HEADERS, new HttpRequestCarrier(request));
+      tracer.inject(span.context(), Builtin.HTTP_HEADERS, new NettyHttpRequestCarrier(request));
 
       Tags.COMPONENT.set(span, HTTP_COMPONENT_NAME);
       Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_CLIENT);

@@ -131,7 +131,7 @@ abstract class TestEnv {
     }
 
     void request(HttpRequest request, Span root) {
-      HttpTracingContext.addClientParentContext(channel(), root.context());
+      NettyHttpTracingContext.addClientParentContext(channel(), root.context());
       request(request);
     }
   }

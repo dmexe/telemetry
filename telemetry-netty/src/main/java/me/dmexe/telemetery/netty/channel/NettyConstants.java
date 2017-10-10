@@ -11,7 +11,7 @@ import io.opentracing.SpanContext;
 import io.opentracing.tag.IntTag;
 import io.opentracing.tag.StringTag;
 
-class Constants {
+class NettyConstants {
   static final String CLIENT_CONNECTION_CLOSED =
       "the client closed the connection before the server answered the request";
   static final String SERVER_CONNECTION_CLOSED =

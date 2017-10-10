@@ -9,16 +9,16 @@ import io.opentracing.Tracer;
 import io.prometheus.client.CollectorRegistry;
 import java.util.Objects;
 import java.util.Queue;
-import me.dmexe.telemetery.netty.channel.ChannelTracingFactory;
-import me.dmexe.telemetery.netty.channel.DefaultChannelTracingFactory;
-import me.dmexe.telemetery.netty.channel.DefaultHttpTracingFactory;
-import me.dmexe.telemetery.netty.channel.HttpTracingFactory;
+import me.dmexe.telemetery.netty.channel.NettyChannelTracingFactory;
+import me.dmexe.telemetery.netty.channel.DefaultNettyChannelTracingFactory;
+import me.dmexe.telemetery.netty.channel.DefaultNettyHttpTracingFactory;
+import me.dmexe.telemetery.netty.channel.NettyHttpTracingFactory;
 
 public class ClientChannelInit extends ChannelInitializer<SocketChannel> {
   private final Queue<HttpResponse> queue;
 
-  private final ChannelTracingFactory channelTracingFactory;
-  private final HttpTracingFactory httpTracingFactory;
+  private final NettyChannelTracingFactory channelTracingFactory;
+  private final NettyHttpTracingFactory httpTracingFactory;
 
   public ClientChannelInit(
       Queue<HttpResponse> queue,
@@ -29,12 +29,12 @@ public class ClientChannelInit extends ChannelInitializer<SocketChannel> {
 
     this.queue = queue;
 
-    this.channelTracingFactory = new DefaultChannelTracingFactory()
+    this.channelTracingFactory = new DefaultNettyChannelTracingFactory()
         .ticker(new ConstantTicker())
         .collectorRegistry(collectorRegistry)
         .address(":0");
 
-    this.httpTracingFactory = new DefaultHttpTracingFactory()
+    this.httpTracingFactory = new DefaultNettyHttpTracingFactory()
         .ticker(new ConstantTicker())
         .collectorRegistry(collectorRegistry)
         .tracer(tracer)
@@ -44,9 +44,9 @@ public class ClientChannelInit extends ChannelInitializer<SocketChannel> {
   @Override
   protected void initChannel(SocketChannel ch) throws Exception {
     final ChannelPipeline pipe = ch.pipeline();
-    pipe.addLast(ChannelTracingFactory.id(), channelTracingFactory.newClientHandler());
+    pipe.addLast(NettyChannelTracingFactory.id(), channelTracingFactory.newClientHandler());
     pipe.addLast(new HttpClientCodec());
-    pipe.addLast(HttpTracingFactory.id(), httpTracingFactory.newClientHandler());
+    pipe.addLast(NettyHttpTracingFactory.id(), httpTracingFactory.newClientHandler());
     pipe.addLast(new ClientHandler(queue));
   }
 }

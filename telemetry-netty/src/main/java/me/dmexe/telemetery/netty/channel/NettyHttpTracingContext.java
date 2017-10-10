@@ -1,7 +1,7 @@
 package me.dmexe.telemetery.netty.channel;
 
-import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_PARENT_SPAN_CONTEXT;
-import static me.dmexe.telemetery.netty.channel.Constants.SERVER_CURRENT_SPAN;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.CLIENT_PARENT_SPAN_CONTEXT;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.SERVER_CURRENT_SPAN;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpRequest;
@@ -10,7 +10,7 @@ import io.opentracing.Span;
 import io.opentracing.SpanContext;
 import org.jetbrains.annotations.Nullable;
 
-public interface HttpTracingContext {
+public interface NettyHttpTracingContext {
 
   void handleRequest(HttpRequest request, Channel channel);
 

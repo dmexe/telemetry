@@ -1,6 +1,6 @@
 package me.dmexe.telemetery.netty.channel;
 
-interface ChannelTracingContext {
+interface NettyChannelTracingContext {
 
   void channelActive();
 

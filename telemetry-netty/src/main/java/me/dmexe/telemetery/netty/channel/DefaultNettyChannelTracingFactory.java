@@ -8,7 +8,7 @@ import io.prometheus.client.Summary;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
-public class DefaultChannelTracingFactory implements ChannelTracingFactory {
+public class DefaultNettyChannelTracingFactory implements NettyChannelTracingFactory {
 
   private static final String CLIENT_SUBSYSTEM = "client";
   private static final String SERVER_SUBSYSTEM = "server";
@@ -83,7 +83,7 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
   @Nullable
   private CollectorRegistry collectorRegistry;
 
-  public DefaultChannelTracingFactory() {
+  public DefaultNettyChannelTracingFactory() {
     this.ticker = System::nanoTime;
   }
 
@@ -93,7 +93,7 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
    * @param collectorRegistry override default connector registry.
    * @return the factory.
    */
-  public DefaultChannelTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
+  public DefaultNettyChannelTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
     this.collectorRegistry = collectorRegistry;
     this.address = ":0";
@@ -106,21 +106,21 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
    * @param ticker override default ticker.
    * @return the factory.
    */
-  public DefaultChannelTracingFactory ticker(Ticker ticker) {
+  public DefaultNettyChannelTracingFactory ticker(Ticker ticker) {
     Objects.requireNonNull(ticker, "ticker cannot be null");
     this.ticker = ticker;
     return this;
   }
 
   @Override
-  public ChannelTracingFactory address(String address) {
+  public NettyChannelTracingFactory address(String address) {
     Objects.requireNonNull(address, "address cannot be null");
     this.address = address;
     return this;
   }
 
   @Override
-  public ChannelTracingFactory address(String host, int port) {
+  public NettyChannelTracingFactory address(String host, int port) {
     Objects.requireNonNull(host, "host cannot be null");
     this.address = host + ":" + port;
     return this;
@@ -128,19 +128,19 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
 
   @Override
   public ChannelHandler newClientHandler() {
-    return new ChannelTracingHandler(newClientTracingContext());
+    return new NettyChannelTracingHandler(newClientTracingContext());
   }
 
   @Override
   public ChannelHandler newServerHandler() {
-    return new ChannelTracingHandler(newServerTracingContext());
+    return new NettyChannelTracingHandler(newServerTracingContext());
   }
 
-  private ChannelTracingContext newClientTracingContext() {
+  private NettyChannelTracingContext newClientTracingContext() {
     final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
 
     if (collectorRegistry == null) {
-      return new DefaultChannelTracingContext(
+      return new DefaultNettyChannelTracingContext(
           address,
           ticker,
           Lazy.clientConnections,
@@ -149,7 +149,7 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
           Lazy.clientBytesSend,
           Lazy.clientBytesReceived);
     } else {
-      return new DefaultChannelTracingContext(
+      return new DefaultNettyChannelTracingContext(
           address,
           ticker,
           connectionsBuilder.subsystem(CLIENT_SUBSYSTEM).register(collectorRegistry),
@@ -160,11 +160,11 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
     }
   }
 
-  private ChannelTracingContext newServerTracingContext() {
+  private NettyChannelTracingContext newServerTracingContext() {
     final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
 
     if (collectorRegistry == null) {
-      return new DefaultChannelTracingContext(
+      return new DefaultNettyChannelTracingContext(
           address,
           ticker,
           Lazy.serverConnections,
@@ -173,7 +173,7 @@ public class DefaultChannelTracingFactory implements ChannelTracingFactory {
           Lazy.serverBytesSend,
           Lazy.serverBytesReceived);
     } else {
-      return new DefaultChannelTracingContext(
+      return new DefaultNettyChannelTracingContext(
           address,
           ticker,
           connectionsBuilder.subsystem(SERVER_SUBSYSTEM).register(collectorRegistry),

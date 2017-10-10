@@ -7,10 +7,10 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
-class HttpRequestCarrier implements TextMap {
+class NettyHttpRequestCarrier implements TextMap {
   private final HttpRequest request;
 
-  HttpRequestCarrier(HttpRequest request) {
+  NettyHttpRequestCarrier(HttpRequest request) {
     Objects.requireNonNull(request, "request cannot be null");
     this.request = request;
   }

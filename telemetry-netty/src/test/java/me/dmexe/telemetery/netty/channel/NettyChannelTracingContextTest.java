@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class ChannelTracingContextTest extends TestEnv {
+class NettyChannelTracingContextTest extends TestEnv {
 
   private CollectorRegistry collectorRegistry;
   private MockTracer tracer;

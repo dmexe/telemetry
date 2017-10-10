@@ -6,7 +6,7 @@ import io.prometheus.client.SimpleTimer;
 import io.prometheus.client.Summary;
 import java.util.Objects;
 
-class DefaultChannelTracingContext implements ChannelTracingContext {
+class DefaultNettyChannelTracingContext implements NettyChannelTracingContext {
   private static final long NULL_NANO = -1L;
   private static final String ACTIVE = "active";
   private static final String INACTIVE = "inactive";
@@ -21,7 +21,7 @@ class DefaultChannelTracingContext implements ChannelTracingContext {
   private final Counter bytesReceived;
   private long connectionStartTimeNanos;
 
-  DefaultChannelTracingContext(
+  DefaultNettyChannelTracingContext(
       String address,
       Ticker ticker,
       Gauge connections,

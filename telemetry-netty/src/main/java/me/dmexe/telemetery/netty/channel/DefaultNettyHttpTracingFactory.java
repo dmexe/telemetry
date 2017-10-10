@@ -1,7 +1,7 @@
 package me.dmexe.telemetery.netty.channel;
 
-import static me.dmexe.telemetery.netty.channel.Constants.CLIENT_SUBSYSTEM;
-import static me.dmexe.telemetery.netty.channel.Constants.SERVER_SUBSYSTEM;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.CLIENT_SUBSYSTEM;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.SERVER_SUBSYSTEM;
 
 import io.netty.channel.ChannelHandler;
 import io.opentracing.Tracer;
@@ -12,7 +12,7 @@ import io.prometheus.client.Histogram;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
-public class DefaultHttpTracingFactory implements HttpTracingFactory {
+public class DefaultNettyHttpTracingFactory implements NettyHttpTracingFactory {
   private static final Counter.Builder handledBuilder = Counter.build()
       .namespace("http")
       .name("handled_total")
@@ -48,7 +48,7 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
   private Tracer tracer;
 
 
-  public DefaultHttpTracingFactory() {
+  public DefaultNettyHttpTracingFactory() {
     this.ticker = System::nanoTime;
   }
 
@@ -58,7 +58,7 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
    * @param collectorRegistry override default collector registry.
    * @return the factory.
    */
-  public DefaultHttpTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
+  public DefaultNettyHttpTracingFactory collectorRegistry(CollectorRegistry collectorRegistry) {
     Objects.requireNonNull(collectorRegistry, "collectorRegistry cannot be null");
     this.collectorRegistry = collectorRegistry;
     this.address = ":0";
@@ -71,28 +71,28 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
    * @param ticker override ticker.
    * @return the factory.
    */
-  public DefaultHttpTracingFactory ticker(Ticker ticker) {
+  public DefaultNettyHttpTracingFactory ticker(Ticker ticker) {
     Objects.requireNonNull(ticker, "ticker cannot be null");
     this.ticker = ticker;
     return this;
   }
 
   @Override
-  public HttpTracingFactory address(String address) {
+  public NettyHttpTracingFactory address(String address) {
     Objects.requireNonNull(address, "address cannot be null");
     this.address = address;
     return this;
   }
 
   @Override
-  public HttpTracingFactory address(String host, int port) {
+  public NettyHttpTracingFactory address(String host, int port) {
     Objects.requireNonNull(host, "host cannot be null");
     this.address = host + ":" + port;
     return this;
   }
 
   @Override
-  public HttpTracingFactory tracer(Tracer tracer) {
+  public NettyHttpTracingFactory tracer(Tracer tracer) {
     Objects.requireNonNull(tracer, "tracer cannot be null");
     this.tracer = tracer;
     return this;
@@ -100,27 +100,27 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
 
   @Override
   public ChannelHandler newClientHandler() {
-    return new HttpClientTracingHandler(newClientTracingContext());
+    return new NettyHttpClientTracingHandler(newClientTracingContext());
   }
 
   @Override
   public ChannelHandler newServerHandler() {
-    return new HttpServerTracingHandler(newServerTracingContext());
+    return new NettyHttpServerTracingHandler(newServerTracingContext());
   }
 
-  private HttpTracingContext newServerTracingContext() {
+  private NettyHttpTracingContext newServerTracingContext() {
     final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
     final Tracer tracer = this.tracer == null ? GlobalTracer.get() : this.tracer;
 
     if (collectorRegistry == null) {
-      return new DefaultHttpServerTracingContext(
+      return new DefaultNettyHttpServerTracingContext(
           address,
           tracer,
           ticker,
           Lazy.serverHandled,
           Lazy.serverLatency);
     } else {
-      return new DefaultHttpServerTracingContext(
+      return new DefaultNettyHttpServerTracingContext(
           address,
           tracer,
           ticker,
@@ -129,19 +129,19 @@ public class DefaultHttpTracingFactory implements HttpTracingFactory {
     }
   }
 
-  private HttpTracingContext newClientTracingContext() {
+  private NettyHttpTracingContext newClientTracingContext() {
     final Ticker ticker = this.ticker == null ? System::nanoTime : this.ticker;
     final Tracer tracer = this.tracer == null ? GlobalTracer.get() : this.tracer;
 
     if (collectorRegistry == null) {
-      return new DefaultHttpClientTracingContext(
+      return new DefaultNettyHttpClientTracingContext(
           address,
           tracer,
           ticker,
           Lazy.clientHandled,
           Lazy.clientLatency);
     } else {
-      return new DefaultHttpClientTracingContext(
+      return new DefaultNettyHttpClientTracingContext(
           address,
           tracer,
           ticker,

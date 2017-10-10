@@ -1,12 +1,12 @@
 package me.dmexe.telemetery.netty.channel;
 
-import static me.dmexe.telemetery.netty.channel.Constants.ERROR_KIND_LOG_NAME;
-import static me.dmexe.telemetery.netty.channel.Constants.ERROR_MESSAGE_LOG_NAME;
-import static me.dmexe.telemetery.netty.channel.Constants.HTTP_COMPONENT_NAME;
-import static me.dmexe.telemetery.netty.channel.Constants.HTTP_CONTENT_LENGTH;
-import static me.dmexe.telemetery.netty.channel.Constants.HTTP_CONTENT_TYPE;
-import static me.dmexe.telemetery.netty.channel.Constants.PEER_ADDRESS;
-import static me.dmexe.telemetery.netty.channel.Constants.SERVER_SEND_LOG_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_KIND_LOG_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_MESSAGE_LOG_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_COMPONENT_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_LENGTH;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_TYPE;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.PEER_ADDRESS;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.SERVER_SEND_LOG_NAME;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
-class DefaultHttpServerTracingContext implements HttpTracingContext {
+class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
   private static final long NULL_NANO = -1L;
 
   private final String address;
@@ -48,7 +48,7 @@ class DefaultHttpServerTracingContext implements HttpTracingContext {
   @Nullable
   private HttpMethod method;
 
-  DefaultHttpServerTracingContext(
+  DefaultNettyHttpServerTracingContext(
       String address,
       Tracer tracer,
       Ticker ticker,
@@ -76,7 +76,7 @@ class DefaultHttpServerTracingContext implements HttpTracingContext {
     code = null;
 
     if (span != null) {
-      HttpTracingContext.addServerCurrentSpan(channel, span);
+      NettyHttpTracingContext.addServerCurrentSpan(channel, span);
     }
   }
 
@@ -146,7 +146,7 @@ class DefaultHttpServerTracingContext implements HttpTracingContext {
   private Span createSpan(HttpRequest request, SocketAddress remoteAddress) {
     final SpanContext parentSpanCtx = tracer.extract(
         Builtin.HTTP_HEADERS,
-        new HttpRequestCarrier(request));
+        new NettyHttpRequestCarrier(request));
 
     final String operationName = "http." + request.method().name();
 

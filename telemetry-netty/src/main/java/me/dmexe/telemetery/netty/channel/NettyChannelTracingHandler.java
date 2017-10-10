@@ -7,10 +7,10 @@ import io.netty.channel.ChannelPromise;
 import io.netty.channel.FileRegion;
 import java.util.Objects;
 
-class ChannelTracingHandler extends ChannelDuplexHandler {
-  private final ChannelTracingContext stats;
+class NettyChannelTracingHandler extends ChannelDuplexHandler {
+  private final NettyChannelTracingContext stats;
 
-  ChannelTracingHandler(ChannelTracingContext stats) {
+  NettyChannelTracingHandler(NettyChannelTracingContext stats) {
     Objects.requireNonNull(stats, "stats cannot be null");
     this.stats = stats;
   }

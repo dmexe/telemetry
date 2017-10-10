@@ -29,7 +29,7 @@ import org.awaitility.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class HttpTracingContextTest extends TestEnv {
+class NettyHttpTracingContextTest extends TestEnv {
   private CollectorRegistry collectorRegistry;
   private MockTracer tracer;
 
