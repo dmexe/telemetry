@@ -49,7 +49,6 @@ task dbMigrate(type: JavaExec) {
   main = "me.dmexe.telemetry.jooq.CreateTables"
 }
 
-
 task jooqSchemaGen(type: JavaExec) {
   description "Generating jooq XMl schema"
   group "db"

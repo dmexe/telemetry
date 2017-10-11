@@ -1,8 +1,4 @@
-apply plugin: 'maven'
-
-task sourceJar(type: Jar) {
-  from sourceSets.main.allJava
-}
+apply plugin: 'maven-publish'
 
 task sourcesJar(type: Jar, dependsOn: classes) {
   classifier = 'sources'
@@ -17,5 +13,36 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
 artifacts {
   archives sourcesJar
   archives javadocJar
+}
+
+def bintray_user = System.getenv('BINTRAY_USER')
+def bintray_key = System.getenv('BINTRAY_KEY')
+
+publishing {
+  repositories {
+    maven {
+      url "${rootProject.buildDir}/repo"
+    }
+
+    if (bintray_user != null && bintray_key != null) {
+      maven {
+        url "https://api.bintray.com/maven/$bintray_user/maven/${rootProject.name}/;publish=1;"
+        credentials {
+          username = bintray_user
+          password = bintray_key
+        }
+      }
+    }
+  }
+}
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      from components.java
+      artifact tasks.sourcesJar
+      artifact tasks.javadocJar
+    }
+  }
 }
 
