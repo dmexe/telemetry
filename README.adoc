@@ -1,3 +1,11 @@
 # telemetry
+// settings
+:badge-build: https://circleci.com/gh/dmexe/telemetry.svg?style=svg
+:build-link: https://circleci.com/gh/dmexe/telemetry
+:badge-maven: https://api.bintray.com/packages/dmexe/maven/telemetry/images/download.svg
+:maven-link: https://bintray.com/dmexe/maven/telemetry/_latestVersion
+
 A collection of handlers, middlewares, and listeners, that record metrics, traces, and mdc
 
+image:{badge-build}["CircleCI", link="{build-link}"]
+image:{badge-maven}["Bintray", link="{maven-link}"]
