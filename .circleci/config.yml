@@ -41,6 +41,9 @@ shared: &shared
     - store_test_results:
         path: telemetry-kafka/build/test-results/junit-platform
 
+    - store_test_results:
+        path: telemetry-mysql/build/test-results/junit-platform
+
     - store_artifacts:
         path: telemetry-netty/build/reports
         destination: netty-reports
@@ -48,6 +51,10 @@ shared: &shared
     - store_artifacts:
         path: telemetry-kafka/build/reports
         destination: kafka-reports
+
+    - store_artifacts:
+        path: telemetry-mysql/build/reports
+        destination: mysql-reports
 
 jobs:
   java8:
