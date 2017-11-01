@@ -1,7 +1,6 @@
 buildscript {
   ext {
-    junit_platform_version = "1.0.0"
-    jmh_report_plugin_version = "0.4.2"
+    junit_platform_version = "1.0.1"
   }
 
   repositories {
@@ -14,6 +13,7 @@ buildscript {
 
   dependencies {
     classpath "org.junit.platform:junit-platform-gradle-plugin:${junit_platform_version}"
+    classpath 'com.github.ben-manes:gradle-versions-plugin:0.17.0'
   }
 }
 
@@ -25,6 +25,7 @@ allprojects {
 }
 
 subprojects {
+  apply plugin: 'com.github.ben-manes.versions'
   apply from: "../gradle/junit.gradle"
   apply from: "../gradle/checks.gradle"
   apply from: "../gradle/publish.gradle"
