@@ -1,0 +1,37 @@
+apply from: "../gradle/java.gradle"
+apply from: "../gradle/versions.gradle"
+
+repositories {
+  mavenCentral()
+}
+
+ext {
+  flyway_version = "4.2.0"
+  mysql_version = "6.0.6"
+  hikari_version = "2.7.2"
+  awaitility_version = "3.0.0"
+}
+
+dependencies {
+  compile "mysql:mysql-connector-java:${mysql_version}"
+  compile "io.prometheus:simpleclient:${prometheus_version}"
+  compile "io.opentracing:opentracing-api:${opentracing_version}"
+  compile "io.opentracing:opentracing-util:${opentracing_version}"
+
+  compileOnly "org.jetbrains:annotations:${jetbrains_annotations_version}"
+  testCompileOnly "org.jetbrains:annotations:${jetbrains_annotations_version}"
+
+  testCompile "com.zaxxer:HikariCP:${hikari_version}"
+  testCompile "ch.qos.logback:logback-classic:${logback_version}"
+  testCompile "io.opentracing:opentracing-mock:${opentracing_version}"
+  testCompile "org.awaitility:awaitility:${awaitility_version}"
+}
+
+task dbMigrate(type: JavaExec) {
+  description "Create database tables"
+  group "db"
+  classpath = sourceSets.test.runtimeClasspath
+  main = "me.dmexe.telemetry.mysql.CreateTables"
+}
+
+test.dependsOn(dbMigrate)

@@ -1,3 +1,4 @@
 include "telemetry-netty"
 include "telemetry-kafka"
 include "telemetry-jooq"
+include "telemetry-mysql"
