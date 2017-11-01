@@ -65,7 +65,7 @@ class KafkaConsumerTracingContextTest extends TestEnv {
             "kafka.key",
             "kafka.offset",
             "kafka.partition",
-            "message_bus.destination");
+            "kafka.topic");
   }
 
   @Test
@@ -96,7 +96,7 @@ class KafkaConsumerTracingContextTest extends TestEnv {
     assertThat(logEntries(span))
         .containsExactly(
             "error.kind=java.lang.RuntimeException",
-            "error.message=boom");
+            "message=boom");
   }
 
   @Test

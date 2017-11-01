@@ -3,6 +3,7 @@ package me.dmexe.telemetry.kafka;
 import static me.dmexe.telemetry.kafka.KafkaConstants.COMPONENT_NAME;
 import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_KEY;
 import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_PARTITION;
+import static me.dmexe.telemetry.kafka.KafkaConstants.TOPIC_KEY;
 
 import io.opentracing.ActiveSpan;
 import io.opentracing.Span;
@@ -49,7 +50,7 @@ class DefaultKafkaProducerTracingFactory implements KafkaProducerTracingFactory 
 
     final String topic = record.topic();
     if (topic != null) {
-      Tags.MESSAGE_BUS_DESTINATION.set(span, topic);
+      TOPIC_KEY.set(span, topic);
     }
 
     final Integer partition = record.partition();

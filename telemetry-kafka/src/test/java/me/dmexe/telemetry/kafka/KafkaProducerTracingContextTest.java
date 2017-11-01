@@ -48,7 +48,7 @@ class KafkaProducerTracingContextTest extends TestEnv {
             "kafka.offset",
             "kafka.partition",
             "kafka.value_size",
-            "message_bus.destination");
+            "kafka.topic");
 
     assertThat(root.context().traceId())
         .isEqualTo(span.context().traceId());
@@ -79,7 +79,7 @@ class KafkaProducerTracingContextTest extends TestEnv {
         "kafka.offset",
         "kafka.partition",
         "kafka.value_size",
-        "message_bus.destination");
+        "kafka.topic");
     assertThat(root.context().traceId())
         .isEqualTo(span.context().traceId());
   }

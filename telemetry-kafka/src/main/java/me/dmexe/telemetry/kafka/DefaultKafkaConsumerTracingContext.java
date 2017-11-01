@@ -10,6 +10,7 @@ import static me.dmexe.telemetry.kafka.KafkaConstants.MDC_TOPIC;
 import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_KEY;
 import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_OFFSET;
 import static me.dmexe.telemetry.kafka.KafkaConstants.RECORD_PARTITION;
+import static me.dmexe.telemetry.kafka.KafkaConstants.TOPIC_KEY;
 
 import io.opentracing.ActiveSpan;
 import io.opentracing.Span;
@@ -117,7 +118,7 @@ class DefaultKafkaConsumerTracingContext<K,V> implements KafkaConsumerTracingCon
 
     Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_CONSUMER);
     Tags.COMPONENT.set(span, COMPONENT_NAME);
-    Tags.MESSAGE_BUS_DESTINATION.set(span, record.topic());
+    TOPIC_KEY.set(span, record.topic());
     RECORD_PARTITION.set(span, record.partition());
     RECORD_OFFSET.set(span, Long.toString(record.offset()));
 
