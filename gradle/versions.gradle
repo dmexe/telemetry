@@ -14,5 +14,8 @@ ext {
   jetbrains_annotations_version = "15.0"
   kafka_version = "0.10.2.1"
   jooq_version = "3.9.2"
-  hikari_version = "2.7.1"
+  hikari_version = "2.7.2"
+  awaitility_version = "3.0.0"
+  mysql_version = "6.0.6"
+  flyway_version = "4.2.0"
 }
