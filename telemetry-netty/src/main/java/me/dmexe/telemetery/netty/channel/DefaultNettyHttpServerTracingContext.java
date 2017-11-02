@@ -22,6 +22,7 @@ import io.prometheus.client.Histogram;
 import io.prometheus.client.SimpleTimer;
 import java.net.SocketAddress;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
   private final Ticker ticker;
   private final Counter handledCounter;
   private final Histogram latencyHistogram;
+  private final List<String> pathsStartWith;
   private long requestStartTimeNanos;
 
   @Nullable
@@ -50,23 +52,30 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
       Tracer tracer,
       Ticker ticker,
       Counter handledCounter,
-      Histogram latencyHistogram) {
+      Histogram latencyHistogram,
+      List<String> pathsStartWith) {
     Objects.requireNonNull(address, "address cannot be null");
     Objects.requireNonNull(tracer, "tracer cannot be null");
     Objects.requireNonNull(ticker, "ticker cannot be null");
     Objects.requireNonNull(latencyHistogram, "latencyHistogram cannot be null");
     Objects.requireNonNull(handledCounter, "handledCounter cannot be null");
+    Objects.requireNonNull(pathsStartWith, "pathsStartWith cannot be null");
     this.address = address;
     this.tracer = tracer;
     this.ticker = ticker;
     this.latencyHistogram = latencyHistogram;
     this.handledCounter = handledCounter;
+    this.pathsStartWith = pathsStartWith;
     this.requestStartTimeNanos = NULL_NANO;
     this.span = null;
   }
 
   @Override
   public void handleRequest(HttpRequest request, Channel channel) {
+    if (!isHandled(request.uri())) {
+      return;
+    }
+
     requestStartTimeNanos = ticker.nanoTime();
     method = request.method();
     span = createSpan(request, channel.remoteAddress());
@@ -80,6 +89,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
   @Override
   public void handleResponse(HttpResponse response) {
     code = Integer.toString(response.status().code());
+
     if (span != null) {
       span.log(SERVER_SEND_LOG_NAME);
 
@@ -163,5 +173,23 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
     Tags.COMPONENT.set(span, HTTP_COMPONENT_NAME);
 
     return span;
+  }
+
+  private boolean isHandled(String path) {
+    if (pathsStartWith.isEmpty()) {
+      return true;
+    }
+
+    if (path == null) {
+      return true;
+    }
+
+    for (String startsWith : pathsStartWith) {
+      if (path.startsWith(startsWith)) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }

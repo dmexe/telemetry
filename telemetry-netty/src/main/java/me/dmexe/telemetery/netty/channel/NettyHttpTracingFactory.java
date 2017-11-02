@@ -10,6 +10,8 @@ public interface NettyHttpTracingFactory {
 
   NettyHttpTracingFactory tracer(Tracer tracer);
 
+  NettyHttpTracingFactory pathsStartWith(String... path);
+
   ChannelHandler newClientHandler();
 
   ChannelHandler newServerHandler();

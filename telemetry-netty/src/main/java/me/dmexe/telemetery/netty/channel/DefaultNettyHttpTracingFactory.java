@@ -9,6 +9,9 @@ import io.opentracing.util.GlobalTracer;
 import io.prometheus.client.CollectorRegistry;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.Nullable;
 
@@ -40,6 +43,7 @@ public class DefaultNettyHttpTracingFactory implements NettyHttpTracingFactory {
 
   private String address;
   private Ticker ticker;
+  private final List<String> pathsStartWith;
 
   @Nullable
   private CollectorRegistry collectorRegistry;
@@ -50,6 +54,7 @@ public class DefaultNettyHttpTracingFactory implements NettyHttpTracingFactory {
 
   public DefaultNettyHttpTracingFactory() {
     this.ticker = System::nanoTime;
+    this.pathsStartWith = new LinkedList<>();
   }
 
   /**
@@ -99,6 +104,12 @@ public class DefaultNettyHttpTracingFactory implements NettyHttpTracingFactory {
   }
 
   @Override
+  public NettyHttpTracingFactory pathsStartWith(String... path) {
+    Collections.addAll(pathsStartWith, path);
+    return this;
+  }
+
+  @Override
   public ChannelHandler newClientHandler() {
     return new NettyHttpClientTracingHandler(newClientTracingContext());
   }
@@ -118,14 +129,16 @@ public class DefaultNettyHttpTracingFactory implements NettyHttpTracingFactory {
           tracer,
           ticker,
           Lazy.serverHandled,
-          Lazy.serverLatency);
+          Lazy.serverLatency,
+          pathsStartWith);
     } else {
       return new DefaultNettyHttpServerTracingContext(
           address,
           tracer,
           ticker,
           handledBuilder.subsystem(SERVER_SUBSYSTEM).register(collectorRegistry),
-          latencyBuilder.subsystem(SERVER_SUBSYSTEM).register(collectorRegistry));
+          latencyBuilder.subsystem(SERVER_SUBSYSTEM).register(collectorRegistry),
+          pathsStartWith);
     }
   }
 
