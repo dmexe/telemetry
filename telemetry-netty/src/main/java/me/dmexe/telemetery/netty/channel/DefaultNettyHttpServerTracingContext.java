@@ -69,7 +69,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
   public void handleRequest(HttpRequest request, Channel channel) {
     requestStartTimeNanos = ticker.nanoTime();
     method = request.method();
-    span = createSpan(request, channel.localAddress());
+    span = createSpan(request, channel.remoteAddress());
     code = null;
 
     if (span != null) {
@@ -140,7 +140,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
     }
   }
 
-  private Span createSpan(HttpRequest request, SocketAddress localAddress) {
+  private Span createSpan(HttpRequest request, SocketAddress remoteAddress) {
     final SpanContext parentSpanCtx = tracer.extract(
         Builtin.HTTP_HEADERS,
         new NettyHttpRequestCarrier(request));
@@ -155,7 +155,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
       span = tracer.buildSpan(operationName).asChildOf(parentSpanCtx).startManual();
     }
 
-    new InetAddressResolver(localAddress).set(span);
+    new InetAddressResolver(remoteAddress).set(span);
 
     Tags.HTTP_METHOD.set(span, request.method().name());
     Tags.HTTP_URL.set(span, request.uri());
