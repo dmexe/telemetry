@@ -20,7 +20,6 @@ import io.opentracing.tag.Tags;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.SimpleTimer;
-import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -88,11 +87,7 @@ class DefaultNettyHttpClientTracingContext implements NettyHttpTracingContext {
       Tags.HTTP_URL.set(span, request.uri());
       Tags.HTTP_METHOD.set(span, request.method().name());
 
-      if (channel.remoteAddress() != null && channel.remoteAddress() instanceof InetSocketAddress) {
-        final InetSocketAddress inetSocketAddress = (InetSocketAddress) channel.remoteAddress();
-        Tags.PEER_HOSTNAME.set(span, inetSocketAddress.getHostString());
-        Tags.PEER_PORT.set(span, inetSocketAddress.getPort());
-      }
+      new InetAddressResolver(channel.remoteAddress()).set(span);
     }
   }
 

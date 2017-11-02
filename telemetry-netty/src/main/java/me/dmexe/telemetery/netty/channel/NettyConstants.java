@@ -42,5 +42,5 @@ class NettyConstants {
   static final String CLIENT_RECEIVE_LOG_NAME = "cr";
 
   static final String ERROR_KIND_LOG_NAME = "error.kind";
-  static final String ERROR_MESSAGE_LOG_NAME = "error.message";
+  static final String ERROR_MESSAGE_LOG_NAME = "message";
 }

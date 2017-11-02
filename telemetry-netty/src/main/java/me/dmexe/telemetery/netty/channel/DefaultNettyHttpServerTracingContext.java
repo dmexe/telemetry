@@ -5,7 +5,6 @@ import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_MESSAGE_LOG
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_COMPONENT_NAME;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_LENGTH;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_TYPE;
-import static me.dmexe.telemetery.netty.channel.NettyConstants.PEER_ADDRESS;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.SERVER_SEND_LOG_NAME;
 
 import io.netty.channel.Channel;
@@ -21,8 +20,6 @@ import io.opentracing.tag.Tags;
 import io.prometheus.client.Counter;
 import io.prometheus.client.Histogram;
 import io.prometheus.client.SimpleTimer;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.HashMap;
 import java.util.Map;
@@ -72,7 +69,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
   public void handleRequest(HttpRequest request, Channel channel) {
     requestStartTimeNanos = ticker.nanoTime();
     method = request.method();
-    span = createSpan(request, channel.remoteAddress());
+    span = createSpan(request, channel.localAddress());
     code = null;
 
     if (span != null) {
@@ -143,7 +140,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
     }
   }
 
-  private Span createSpan(HttpRequest request, SocketAddress remoteAddress) {
+  private Span createSpan(HttpRequest request, SocketAddress localAddress) {
     final SpanContext parentSpanCtx = tracer.extract(
         Builtin.HTTP_HEADERS,
         new NettyHttpRequestCarrier(request));
@@ -158,15 +155,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
       span = tracer.buildSpan(operationName).asChildOf(parentSpanCtx).startManual();
     }
 
-    if (address != null && remoteAddress instanceof InetSocketAddress) {
-      final InetSocketAddress inetSocketAddress = (InetSocketAddress) remoteAddress;
-      final InetAddress inetAddress = inetSocketAddress.getAddress();
-
-      if (inetAddress != null) {
-        PEER_ADDRESS.set(span, inetAddress.getHostAddress());
-        Tags.PEER_PORT.set(span, inetSocketAddress.getPort());
-      }
-    }
+    new InetAddressResolver(localAddress).set(span);
 
     Tags.HTTP_METHOD.set(span, request.method().name());
     Tags.HTTP_URL.set(span, request.uri());

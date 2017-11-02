@@ -180,7 +180,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("http.content_length", 4)
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/ping")
-        .containsKeys("peer.port", "peer.address");
+        .containsKeys("peer.port", "peer.hostname");
     assertThat(logEntries(serverSpan))
         .containsExactly("event=ss");
 
@@ -224,7 +224,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("span.kind", "server")
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/server/error")
-        .containsKeys("peer.port", "peer.address");
+        .containsKeys("peer.port", "peer.hostname");
     assertThat(logEntries(serverSpan))
         .containsExactly("event=ss");
 
@@ -269,9 +269,9 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("http.status_code", 499)
         .containsEntry("error", true);
     assertThat(logEntries(serverSpan))
-        .containsExactly(
+        .contains(
             "error.kind=java.lang.String",
-            "error.message=the client closed the connection before the server answered the request",
+            "message=the client closed the connection before the server answered the request",
             "event=ss");
 
     await().timeout(TWO_SECONDS).untilAsserted(() ->
@@ -327,9 +327,9 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("http.status_code", 500)
         .containsEntry("error", true);
     assertThat(logEntries(clientSpan))
-        .containsExactly(
+        .contains(
             "error.kind=java.lang.String",
-            "error.message=the server closed the connection before the client received the response",
+            "message=the server closed the connection before the client received the response",
             "event=cr");
 
     await().timeout(TWO_SECONDS).untilAsserted(() ->
