@@ -180,7 +180,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("http.content_length", 4)
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/ping")
-        .containsKeys("peer.port", "peer.hostname");
+        .containsKeys("peer.port");
     assertThat(logEntries(serverSpan))
         .containsExactly("event=ss");
 
@@ -191,7 +191,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("http.content_length", 4)
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/ping")
-        .containsKeys("peer.port", "peer.hostname");
+        .containsKeys("peer.port");
     assertThat(logEntries(clientSpan))
         .containsExactly("event=cr");
 
@@ -224,7 +224,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("span.kind", "server")
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/server/error")
-        .containsKeys("peer.port", "peer.hostname");
+        .containsKeys("peer.port");
     assertThat(logEntries(serverSpan))
         .containsExactly("event=ss");
 
@@ -234,7 +234,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("span.kind", "client")
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/server/error")
-        .containsKeys("peer.port", "peer.hostname");
+        .containsKeys("peer.port");
     assertThat(logEntries(clientSpan))
         .containsExactly("event=cr");
 
