@@ -34,7 +34,7 @@ class TracingTest extends TestEnv {
         .containsEntry("db.user", "root")
         .containsEntry("peer.hostname", "localhost")
         .containsEntry("peer.port", 3306)
-        .containsEntry("peer.service", "mysql-telemetry");
+        .containsEntry("peer.service", "MySql");
   }
 
   @Test
@@ -60,7 +60,7 @@ class TracingTest extends TestEnv {
         .containsEntry("db.user", "root")
         .containsEntry("peer.hostname", "localhost")
         .containsEntry("peer.port", 3306)
-        .containsEntry("peer.service", "mysql-telemetry");
+        .containsEntry("peer.service", "MySql");
   }
 
   @Test
@@ -86,7 +86,7 @@ class TracingTest extends TestEnv {
         .containsEntry("db.user", "root")
         .containsEntry("peer.hostname", "localhost")
         .containsEntry("peer.port", 3306)
-        .containsEntry("peer.service", "mysql-telemetry")
+        .containsEntry("peer.service", "MySql")
         .containsEntry("error", true);
   }
   private void newSpan(ThrowingRunnable runnable) throws Throwable {
