@@ -65,6 +65,7 @@ class DefaultKafkaProducerTracingFactory implements KafkaProducerTracingFactory 
 
     Tags.COMPONENT.set(span, COMPONENT_NAME);
     Tags.SPAN_KIND.set(span, Tags.SPAN_KIND_PRODUCER);
+    Tags.PEER_SERVICE.set(span, "Kafka");
 
     return new DefaultKafkaProducerTracingContext(span);
   }

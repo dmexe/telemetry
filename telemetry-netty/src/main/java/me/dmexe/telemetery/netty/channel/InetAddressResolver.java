@@ -30,9 +30,7 @@ class InetAddressResolver {
     }
 
     Tags.PEER_PORT.set(span, inetSocketAddress.getPort());
-
     final InetAddress inetAddress = inetSocketAddress.getAddress();
-    Tags.PEER_HOSTNAME.set(span, inetAddress.getHostName());
 
     if (inetAddress instanceof Inet4Address) {
       final Inet4Address inet4Address = (Inet4Address) inetAddress;
@@ -40,6 +38,8 @@ class InetAddressResolver {
     } else if (inetAddress instanceof Inet6Address) {
       final Inet6Address inet6Address = (Inet6Address) inetAddress;
       Tags.PEER_HOST_IPV6.set(span, inet6Address.getHostAddress());
+    } else {
+      Tags.PEER_HOSTNAME.set(span, inetAddress.getHostName());
     }
   }
 }

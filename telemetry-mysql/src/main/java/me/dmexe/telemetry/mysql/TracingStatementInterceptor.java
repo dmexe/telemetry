@@ -191,7 +191,7 @@ public class TracingStatementInterceptor implements StatementInterceptor {
     private String getServiceName(MysqlConnection conn) {
       String serviceName = conn.getProperties().getProperty("tracingServiceName");
       if (serviceName == null || serviceName.equals("")) {
-        serviceName = database.equals(UNKNOWN_DATABASE) ? "mysql" : "mysql-" + database;
+        serviceName = "MySql";
       }
       return serviceName;
     }
