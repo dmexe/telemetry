@@ -37,9 +37,10 @@ class NettyConstants {
   static final StringTag HTTP_CONTENT_TYPE = new StringTag("http.content_type");
   static final IntTag HTTP_CONTENT_LENGTH = new IntTag("http.content_length");
   static final StringTag PEER_ADDRESS = new StringTag("peer.address");
+  static final StringTag LOCAL_ADDRESS = new StringTag(("local.address"));
 
-  static final String SERVER_SEND_LOG_NAME = "ss";
-  static final String CLIENT_RECEIVE_LOG_NAME = "cr";
+  static final String WIRE_SEND = "ws";
+  static final String WIRE_RECV = "wr";
 
   static final String ERROR_KIND_LOG_NAME = "error.kind";
   static final String ERROR_MESSAGE_LOG_NAME = "message";

@@ -1,13 +1,13 @@
 package me.dmexe.telemetery.netty.channel;
 
+import static me.dmexe.telemetery.netty.channel.NettyConstants.LOCAL_ADDRESS;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.PEER_ADDRESS;
+
 import io.opentracing.Span;
 import io.opentracing.tag.Tags;
-import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.ByteBuffer;
 
 class InetAddressResolver {
   private final InetSocketAddress inetSocketAddress;
@@ -20,7 +20,7 @@ class InetAddressResolver {
     }
   }
 
-  void set(Span span) {
+  void setPeerAddress(Span span) {
     if (inetSocketAddress == null) {
       return;
     }
@@ -29,17 +29,28 @@ class InetAddressResolver {
       return;
     }
 
-    Tags.PEER_PORT.set(span, inetSocketAddress.getPort());
     final InetAddress inetAddress = inetSocketAddress.getAddress();
 
-    if (inetAddress instanceof Inet4Address) {
-      final Inet4Address inet4Address = (Inet4Address) inetAddress;
-      Tags.PEER_HOST_IPV4.set(span, ByteBuffer.wrap(inet4Address.getAddress()).getInt());
-    } else if (inetAddress instanceof Inet6Address) {
-      final Inet6Address inet6Address = (Inet6Address) inetAddress;
-      Tags.PEER_HOST_IPV6.set(span, inet6Address.getHostAddress());
+    if (inetSocketAddress.isUnresolved() || inetAddress == null || inetAddress.getHostAddress() == null) {
+      Tags.PEER_HOSTNAME.set(span, inetSocketAddress.getHostString() + ":" + inetSocketAddress.getPort());
     } else {
-      Tags.PEER_HOSTNAME.set(span, inetAddress.getHostName());
+      PEER_ADDRESS.set(span, inetAddress.getHostAddress() + ":" + inetSocketAddress.getPort());
+    }
+  }
+
+  void setLocalAddress(Span span) {
+    if (inetSocketAddress == null || inetSocketAddress.isUnresolved()) {
+      return;
+    }
+
+    if (span == null) {
+      return;
+    }
+
+    final InetAddress inetAddress = inetSocketAddress.getAddress();
+
+    if (inetAddress != null && inetAddress.getHostAddress() != null) {
+      LOCAL_ADDRESS.set(span, inetAddress.getHostAddress() + ":" + inetSocketAddress.getPort());
     }
   }
 }

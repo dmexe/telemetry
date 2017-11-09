@@ -5,7 +5,7 @@ import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_MESSAGE_LOG
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_COMPONENT_NAME;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_LENGTH;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_TYPE;
-import static me.dmexe.telemetery.netty.channel.NettyConstants.SERVER_SEND_LOG_NAME;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.WIRE_SEND;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -69,7 +69,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
   public void handleRequest(HttpRequest request, Channel channel) {
     requestStartTimeNanos = ticker.nanoTime();
     method = request.method();
-    span = createSpan(request, channel.remoteAddress());
+    span = createSpan(request, channel.remoteAddress(), channel.localAddress());
     code = null;
 
     if (span != null) {
@@ -81,7 +81,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
   public void handleResponse(HttpResponse response) {
     code = Integer.toString(response.status().code());
     if (span != null) {
-      span.log(SERVER_SEND_LOG_NAME);
+      span.log(WIRE_SEND);
 
       Tags.HTTP_STATUS.set(span, response.status().code());
 
@@ -140,7 +140,7 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
     }
   }
 
-  private Span createSpan(HttpRequest request, SocketAddress remoteAddress) {
+  private Span createSpan(HttpRequest request, SocketAddress remoteAddress, SocketAddress localAddress) {
     final SpanContext parentSpanCtx = tracer.extract(
         Builtin.HTTP_HEADERS,
         new NettyHttpRequestCarrier(request));
@@ -155,7 +155,8 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
       span = tracer.buildSpan(operationName).asChildOf(parentSpanCtx).startManual();
     }
 
-    new InetAddressResolver(remoteAddress).set(span);
+    new InetAddressResolver(remoteAddress).setPeerAddress(span);
+    new InetAddressResolver(localAddress).setLocalAddress(span);
 
     Tags.HTTP_METHOD.set(span, request.method().name());
     Tags.HTTP_URL.set(span, request.uri());

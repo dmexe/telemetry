@@ -1,11 +1,11 @@
 package me.dmexe.telemetery.netty.channel;
 
-import static me.dmexe.telemetery.netty.channel.NettyConstants.CLIENT_RECEIVE_LOG_NAME;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_KIND_LOG_NAME;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.ERROR_MESSAGE_LOG_NAME;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_COMPONENT_NAME;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_LENGTH;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.HTTP_CONTENT_TYPE;
+import static me.dmexe.telemetery.netty.channel.NettyConstants.WIRE_RECV;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -87,7 +87,7 @@ class DefaultNettyHttpClientTracingContext implements NettyHttpTracingContext {
       Tags.HTTP_URL.set(span, request.uri());
       Tags.HTTP_METHOD.set(span, request.method().name());
 
-      new InetAddressResolver(channel.remoteAddress()).set(span);
+      new InetAddressResolver(channel.remoteAddress()).setPeerAddress(span);
     }
   }
 
@@ -96,7 +96,7 @@ class DefaultNettyHttpClientTracingContext implements NettyHttpTracingContext {
     code = Integer.toString(response.status().code());
 
     if (span != null) {
-      span.log(CLIENT_RECEIVE_LOG_NAME);
+      span.log(WIRE_RECV);
       Tags.HTTP_STATUS.set(span, response.status().code());
 
       final String contentType = response.headers().get(HttpHeaderNames.CONTENT_TYPE);

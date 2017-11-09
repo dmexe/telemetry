@@ -180,9 +180,9 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("http.content_length", 4)
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/ping")
-        .containsKeys("peer.port");
+        .containsKeys("peer.address", "local.address");
     assertThat(logEntries(serverSpan))
-        .containsExactly("event=ss");
+        .containsExactly("event=ws");
 
     final MockSpan clientSpan = getClientSpan();
     assertThat(clientSpan.tags())
@@ -191,9 +191,9 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("http.content_length", 4)
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/ping")
-        .containsKeys("peer.port");
+        .containsKeys("peer.address");
     assertThat(logEntries(clientSpan))
-        .containsExactly("event=cr");
+        .containsExactly("event=wr");
 
     assertThat(root.context().traceId())
         .isEqualTo(clientSpan.context().traceId())
@@ -224,9 +224,9 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("span.kind", "server")
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/server/error")
-        .containsKeys("peer.port");
+        .containsKeys("peer.address");
     assertThat(logEntries(serverSpan))
-        .containsExactly("event=ss");
+        .containsExactly("event=ws");
 
     final MockSpan clientSpan = getClientSpan();
     assertThat(clientSpan.tags())
@@ -234,9 +234,9 @@ class NettyHttpTracingContextTest extends TestEnv {
         .containsEntry("span.kind", "client")
         .containsEntry("http.method", "GET")
         .containsEntry("http.url", "/server/error")
-        .containsKeys("peer.port");
+        .containsKeys("peer.address");
     assertThat(logEntries(clientSpan))
-        .containsExactly("event=cr");
+        .containsExactly("event=wr");
 
     assertThat(root.context().traceId())
         .isEqualTo(clientSpan.context().traceId())
@@ -272,7 +272,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .contains(
             "error.kind=java.lang.String",
             "message=the client closed the connection before the server answered the request",
-            "event=ss");
+            "event=ws");
 
     await().timeout(TWO_SECONDS).untilAsserted(() ->
         assertThat(samples(collectorRegistry, "http_server"))
@@ -330,7 +330,7 @@ class NettyHttpTracingContextTest extends TestEnv {
         .contains(
             "error.kind=java.lang.String",
             "message=the server closed the connection before the client received the response",
-            "event=cr");
+            "event=wr");
 
     await().timeout(TWO_SECONDS).untilAsserted(() ->
         assertThat(samples(collectorRegistry, "http_client"))
