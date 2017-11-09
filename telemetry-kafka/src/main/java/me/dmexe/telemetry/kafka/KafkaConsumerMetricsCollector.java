@@ -27,7 +27,9 @@ public class KafkaConsumerMetricsCollector extends Collector {
           if (clientId != null) {
             final List<String> labelValues = new ArrayList<>(1);
             labelValues.add(clientId);
-            samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+            samples.add(
+                gauge(name, "client_id")
+                    .addMetric(labelValues, metric.value()));
           }
           break;
         }
@@ -36,16 +38,30 @@ public class KafkaConsumerMetricsCollector extends Collector {
           if (clientId != null) {
             final List<String> labelValues = new ArrayList<>(1);
             labelValues.add(clientId);
-            samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+            samples.add(
+                gauge(name, "client_id")
+                    .addMetric(labelValues, metric.value()));
           }
           break;
         }
         case "consumer-fetch-manager-metrics": {
           final String clientId = name.tags().get("client-id");
-          if (clientId != null) {
-            final List<String> labelValues = new ArrayList<>(1);
-            labelValues.add(clientId);
-            samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+          if (clientId != null && !name.name().contains(".")) {
+            final String topic = name.tags().get("topic");
+            if (topic != null) {
+              final List<String> labelValues = new ArrayList<>(2);
+              labelValues.add(clientId);
+              labelValues.add(topic);
+              samples
+                  .add(gauge(name, "client_id", "topic")
+                      .addMetric(labelValues, metric.value()));
+            } else {
+              final List<String> labelValues = new ArrayList<>(1);
+              labelValues.add(clientId);
+              samples.add(
+                  gauge(name, "client_id")
+                      .addMetric(labelValues, metric.value()));
+            }
           }
           break;
         }
