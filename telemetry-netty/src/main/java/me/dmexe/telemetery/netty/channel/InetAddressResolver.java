@@ -1,10 +1,10 @@
 package me.dmexe.telemetery.netty.channel;
 
+import static io.opentracing.tag.Tags.PEER_HOSTNAME;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.LOCAL_ADDRESS;
 import static me.dmexe.telemetery.netty.channel.NettyConstants.PEER_ADDRESS;
 
 import io.opentracing.Span;
-import io.opentracing.tag.Tags;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -31,10 +31,16 @@ class InetAddressResolver {
 
     final InetAddress inetAddress = inetSocketAddress.getAddress();
 
-    if (inetSocketAddress.isUnresolved() || inetAddress == null || inetAddress.getHostAddress() == null) {
-      Tags.PEER_HOSTNAME.set(span, inetSocketAddress.getHostString() + ":" + inetSocketAddress.getPort());
+    if (inetSocketAddress.isUnresolved()
+        || inetAddress == null
+        || inetAddress.getHostAddress() == null) {
+      PEER_HOSTNAME.set(
+          span,
+          inetSocketAddress.getHostString() + ":" + inetSocketAddress.getPort());
     } else {
-      PEER_ADDRESS.set(span, inetAddress.getHostAddress() + ":" + inetSocketAddress.getPort());
+      PEER_ADDRESS.set(
+          span,
+          inetAddress.getHostAddress() + ":" + inetSocketAddress.getPort());
     }
   }
 
@@ -50,7 +56,9 @@ class InetAddressResolver {
     final InetAddress inetAddress = inetSocketAddress.getAddress();
 
     if (inetAddress != null && inetAddress.getHostAddress() != null) {
-      LOCAL_ADDRESS.set(span, inetAddress.getHostAddress() + ":" + inetSocketAddress.getPort());
+      LOCAL_ADDRESS.set(
+          span,
+          inetAddress.getHostAddress() + ":" + inetSocketAddress.getPort());
     }
   }
 }

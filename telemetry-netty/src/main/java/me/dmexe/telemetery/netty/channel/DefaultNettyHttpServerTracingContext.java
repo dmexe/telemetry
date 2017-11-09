@@ -140,7 +140,10 @@ class DefaultNettyHttpServerTracingContext implements NettyHttpTracingContext {
     }
   }
 
-  private Span createSpan(HttpRequest request, SocketAddress remoteAddress, SocketAddress localAddress) {
+  private Span createSpan(
+      HttpRequest request,
+      SocketAddress remoteAddress,
+      SocketAddress localAddress) {
     final SpanContext parentSpanCtx = tracer.extract(
         Builtin.HTTP_HEADERS,
         new NettyHttpRequestCarrier(request));
