@@ -49,6 +49,8 @@ public class KafkaConsumerMetricsCollector extends Collector {
           }
           break;
         }
+        default:
+          break;
       }
     });
 
