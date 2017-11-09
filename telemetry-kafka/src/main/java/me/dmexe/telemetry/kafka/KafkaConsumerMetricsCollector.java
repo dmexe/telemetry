@@ -21,20 +21,33 @@ public class KafkaConsumerMetricsCollector extends Collector {
     final List<MetricFamilySamples> samples = new LinkedList<>();
 
     producer.metrics().forEach((name, metric) -> {
-      if (name.group().equals("consumer-metrics")) {
-        final String clientId = name.tags().get("client-id");
-        if (clientId != null) {
-          final List<String> labelValues = new ArrayList<>(1);
-          labelValues.add(clientId);
-          samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+      switch (name.group()) {
+        case "consumer-metrics": {
+          final String clientId = name.tags().get("client-id");
+          if (clientId != null) {
+            final List<String> labelValues = new ArrayList<>(1);
+            labelValues.add(clientId);
+            samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+          }
+          break;
         }
-
-      } else if (name.group().equals("consumer-coordinator-metrics")) {
-        final String clientId = name.tags().get("client-id");
-        if (clientId != null) {
-          final List<String> labelValues = new ArrayList<>(1);
-          labelValues.add(clientId);
-          samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+        case "consumer-coordinator-metrics": {
+          final String clientId = name.tags().get("client-id");
+          if (clientId != null) {
+            final List<String> labelValues = new ArrayList<>(1);
+            labelValues.add(clientId);
+            samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+          }
+          break;
+        }
+        case "consumer-fetch-manager-metrics": {
+          final String clientId = name.tags().get("client-id");
+          if (clientId != null) {
+            final List<String> labelValues = new ArrayList<>(1);
+            labelValues.add(clientId);
+            samples.add(gauge(name, "client_id").addMetric(labelValues, metric.value()));
+          }
+          break;
         }
       }
     });

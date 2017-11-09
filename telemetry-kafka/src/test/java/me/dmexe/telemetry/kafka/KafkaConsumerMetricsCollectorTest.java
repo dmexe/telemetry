@@ -5,6 +5,7 @@ import static org.assertj.core.util.Lists.newArrayList;
 
 import io.prometheus.client.CollectorRegistry;
 import java.time.Duration;
+import java.util.List;
 import java.util.stream.IntStream;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
@@ -44,7 +45,8 @@ class KafkaConsumerMetricsCollectorTest extends TestEnv {
       consumer.commitSync();
     }
 
-    assertThat(sampleKeys(collectorRegistry))
+    List<String> metrics = sampleKeys(collectorRegistry);
+    assertThat(metrics)
         .isNotEmpty()
         .areAtLeast(13, new Condition<>(s -> true, "true"));
   }
