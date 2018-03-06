@@ -79,6 +79,12 @@ public class NettyHttpServerTracingHandler extends ChannelDuplexHandler {
       stats.exceptionCaught(CLIENT_CONNECTION_CLOSED);
     }
 
+    // failed to flush last frame
+    if (state == State.RESPONSE_SEND) {
+      nextState(State.COMPLETED);
+      nextState(State.IDLE);
+    }
+
     if (state != State.IDLE) {
       nextState(State.IDLE);
     }
