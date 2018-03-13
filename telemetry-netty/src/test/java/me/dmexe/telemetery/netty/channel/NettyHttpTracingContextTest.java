@@ -324,13 +324,9 @@ class NettyHttpTracingContextTest extends TestEnv {
     final MockSpan clientSpan = getClientSpan();
 
     assertThat(clientSpan.tags())
-        .containsEntry("http.status_code", 500)
-        .containsEntry("error", true);
+        .containsEntry("http.status_code", 500);
     assertThat(logEntries(clientSpan))
-        .contains(
-            "error.kind=java.lang.String",
-            "message=the server closed the connection before the client received the response",
-            "event=wr");
+        .contains("event=wr");
 
     await().timeout(TWO_SECONDS).untilAsserted(() ->
         assertThat(samples(collectorRegistry, "http_client"))
