@@ -78,7 +78,6 @@ class NettyHttpClientTracingHandler extends ChannelDuplexHandler {
     if (state == State.REQUEST_SEND) {
       state = State.RESPONSE_RECEIVED;
       stats.handleResponse(SERVER_CONNECTION_CLOSED_RESPONSE);
-      stats.exceptionCaught(SERVER_CONNECTION_CLOSED);
 
       if (nextState(State.COMPLETED)) {
         stats.completed();
@@ -89,8 +88,6 @@ class NettyHttpClientTracingHandler extends ChannelDuplexHandler {
     // If response received, but channel channel deactivated without last http content, force close
     // successfully
     if (state == State.RESPONSE_RECEIVED) {
-      stats.exceptionCaught(SERVER_CONNECTION_CLOSED);
-
       if (nextState(State.COMPLETED)) {
         stats.completed();
         nextState(State.IDLE);
